@@ -1,3 +1,5 @@
+const COORD_EMAIL = 'claudio.teste@example.com';
+const COORD_PASSWORD = 'claudio123';
 const TEACHER = 'Ana Beatriz Moura';
 const TODAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const TURMAS = ['7º Ano A', '8º Ano B', '9º Ano A'];
@@ -67,7 +69,7 @@ class Component extends DCLogic {
   state = (() => {
     let records = SEED;
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(s) && s.length) records = s; } catch (e) {}
-    return { screen: 'login', email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
+    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
   })();
 
   persist(records) { try { localStorage.setItem(KEY, JSON.stringify(records)); } catch (e) {} }
@@ -104,6 +106,16 @@ class Component extends DCLogic {
     const r = this.state.records.find(x => x.id === id);
     if (!r) return;
     this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
+  }
+
+  saveCoord(id, event) {
+    event.preventDefault();
+    if (!this.state.coordinator) return;
+    const coordObservation = String(new FormData(event.currentTarget).get('note') || '').trim();
+    const records = this.state.records.map(record => record.id === id ? { ...record, coordObservation } : record);
+    this.persist(records);
+    this.setState({ records });
+    this.flash('Observação da coordenação atualizada.');
   }
 
   filtered() {
@@ -150,6 +162,9 @@ class Component extends DCLogic {
       splashH: s.splash === 'fly' ? '44px' : '120px',
       splashTf: s.splash === 'fly' ? 'translate(0,-50%)' : 'translate(-50%,-50%)',
       isLogin: s.screen === 'login', notLogin: s.screen !== 'login',
+      isCoordinator: s.coordinator,
+      isTeacher: !s.coordinator,
+      listTitle: s.coordinator ? 'Coordenação e Direção' : 'Semanários salvos',
       isHome: s.screen === 'home', isCreate: s.screen === 'create', isList: s.screen === 'list', isPrint: s.screen === 'print',
       email: s.email, password: s.password, loginError: s.loginError,
       onEmail: val(v => this.setState({ email: v, loginError: '' })),
@@ -158,6 +173,15 @@ class Component extends DCLogic {
         e.preventDefault();
         if (!s.email.includes('@') || !s.password) {
           this.setState({ loginError: 'Informe um e-mail válido e a senha.' });
+          return;
+        }
+        const coordinator = s.email.trim().toLowerCase() === COORD_EMAIL;
+        if (coordinator) {
+          if (s.password !== COORD_PASSWORD) {
+            this.setState({ loginError: 'Senha de teste incorreta.' });
+            return;
+          }
+          this.go('list', { coordinator: true });
           return;
         }
         if (s.splash) return;
@@ -173,9 +197,9 @@ class Component extends DCLogic {
       logout: () => {
         clearTimeout(this._splashEnd);
         clearTimeout(this._riseEnd);
-        this.go('login', { password: '', splash: '', rise: false });
+        this.go('login', { password: '', coordinator: false, splash: '', rise: false, selected: [] });
       },
-      goHome: () => this.go('home'),
+      goHome: () => this.go(s.coordinator ? 'list' : 'home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
       goList: () => this.go('list'),
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
@@ -209,7 +233,7 @@ class Component extends DCLogic {
       selectedLabel: nSel ? nSel + (nSel === 1 ? ' selecionado' : ' selecionados') : 'Nenhum selecionado',
       noSelection: nSel === 0, printOpacity: nSel ? 1 : 0.45,
       goPrint: () => { if (nSel) this.go('print', { printIds: [...s.selected] }); },
-      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || 'Nenhuma observação da coordenação.', mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
+      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoord: e => this.saveCoord(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,
