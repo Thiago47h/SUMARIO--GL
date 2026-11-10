@@ -5,13 +5,13 @@
 <title>Semanário | Colégio Gênesis Life</title>
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/app.css?v=4">
+<link rel="stylesheet" href="css/app.css?v=5">
 <script defer src="js/bootstrap.js"></script>
 </head>
 <body>
 <x-dc>
 
-<div style="min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg,#eadfc6);color:var(--color-text,#201e1d);font-family:var(--font-body);font-size:16px">
+<div data-app-shell="true" style="min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg,#eadfc6);color:var(--color-text,#201e1d);font-family:var(--font-body);font-size:16px">
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="01 Login" style="flex:1;display:flex;align-items:center;padding:var(--space-8) clamp(20px,8vw,120px)">
