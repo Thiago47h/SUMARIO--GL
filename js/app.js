@@ -195,7 +195,7 @@ class Component extends DCLogic {
       setWeek: val(v => this.setF('date', v)),
       setWeekEnd: val(v => this.setF('endDate', v)), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
       setPaginas: val(v => this.setF('paginas', v)), setConteudo: val(v => this.setF('conteudo', v)), setTarefa: val(v => this.setF('tarefa', v)), setObs: val(v => this.setF('obs', v)),
-      aulaChips: [1, 2, 3, 4, 5, 6, 7].map(n => { const on = s.f.aulas.includes(n); return { label: n + 'ª aula', on, border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent)' : 'var(--color-surface)', fg: on ? 'var(--color-bg)' : 'var(--color-text)', toggle: () => this.setF('aulas', on ? s.f.aulas.filter(x => x !== n) : [...s.f.aulas, n]) }; }),
+      aulaChips: [1, 2, 3, 4, 5, 6].map(n => { const on = s.f.aulas.includes(n); return { label: n + 'ª aula', on, border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent)' : 'var(--color-surface)', fg: on ? 'var(--color-bg)' : 'var(--color-text)', toggle: () => this.setF('aulas', on ? s.f.aulas.filter(x => x !== n) : [...s.f.aulas, n]) }; }),
       aulasPreview: s.f.aulas.length ? 'Selecionado: ' + aulasLabel(s.f.aulas) : '',
       onSave: e => { e.preventDefault(); this.save(false); },
       onSaveAnother: () => this.save(true),
