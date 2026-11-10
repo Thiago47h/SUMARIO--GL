@@ -17,3 +17,76 @@ body{background:#f4ecd9}
 [data-print-page]{box-shadow:none !important;max-width:none !important;min-height:0 !important;padding:0 !important}
 @page{size:A4;margin:14mm}
 }
+
+.print-format-label {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+.print-format-label select {
+  min-height: 44px;
+  padding: 6px 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+}
+[data-print-page][data-print-format="compact"] {
+  max-width: 1123px !important;
+  min-height: 794px !important;
+}
+.print-week-title, .print-day-title {
+  break-after: avoid;
+}
+.print-week-title {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 6px;
+  font-size: 19px;
+}
+.print-day-title {
+  font-size: 15px;
+  text-transform: capitalize;
+  margin: 12px 0 4px;
+}
+.print-week-lesson {
+  padding: 6px 0;
+  break-inside: avoid;
+}
+.print-week-lesson p {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.print-compact-scroll {
+  overflow-x: auto;
+}
+.print-compact-table {
+  min-width: 560px;
+  font-size: 13px;
+}
+.print-compact-row {
+  display: grid;
+  grid-template-columns: 85px 85px 80px minmax(95px, 1fr) minmax(0, 3fr);
+  break-inside: avoid;
+  border-bottom: 1px solid var(--color-divider);
+}
+.print-compact-row > * {
+  padding: 7px;
+  overflow-wrap: anywhere;
+}
+.print-compact-header {
+  break-after: avoid;
+  border-bottom: 2px solid currentColor;
+}
+
+@page semanarioPaisagem { size: A4 landscape; margin: 14mm; }
+@media print {
+  [data-print-page][data-print-format="compact"] {
+    page: semanarioPaisagem;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+  .print-compact-scroll { overflow: visible; }
+  .print-compact-table { min-width: 0; }
+  body, [data-print-page] { background: white !important; }
+}

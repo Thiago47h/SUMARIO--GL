@@ -24,11 +24,34 @@ const blank = () => ({ date: TODAY, turma: '', disciplina: '', aulas: [], pagina
 const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: fmt(r.date), dateLong: WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
+function groupPrintWeeks(records) {
+  const weeks = new Map();
+  for (const record of records) {
+    const monday = dp(record.date);
+    monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+    const friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+    const label = date => date.toLocaleDateString('pt-BR');
+    const weekKey = monday.getTime() + '|' + record.turma;
+    if (!weeks.has(weekKey)) {
+      weeks.set(weekKey, {
+        turma: record.turma,
+        period: label(monday) + ' a ' + label(friday),
+        days: new Map(),
+      });
+    }
+    const { days } = weeks.get(weekKey);
+    if (!days.has(record.date)) days.set(record.date, { title: record.dateLong, records: [] });
+    days.get(record.date).records.push(record);
+  }
+  return [...weeks.values()].map(week => ({ ...week, days: [...week.days.values()] }));
+}
+
 class Component extends DCLogic {
   state = (() => {
     let records = SEED;
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(s) && s.length) records = s; } catch (e) {}
-    return { screen: 'login', email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], openId: null, toast: '', splash: '', rise: false };
+    return { screen: 'login', email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
   })();
 
   persist(records) { try { localStorage.setItem(KEY, JSON.stringify(records)); } catch (e) {} }
@@ -145,6 +168,13 @@ class Component extends DCLogic {
       rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
+      printFormat: s.printFormat,
+      setPrintFormat: val(printFormat => this.setState({ printFormat })),
+      weeklyPrint: s.printFormat === 'weekly',
+      compactPrint: s.printFormat === 'compact',
+      detailedPrint: s.printFormat === 'detailed',
+      printOrientation: s.printFormat === 'compact' ? 'paisagem' : 'retrato',
+      printWeeks: s.printFormat === 'weekly' ? groupPrintWeeks(printRecs) : [],
       doPrint: () => window.print(),
 
       hasOpen: !!openRec, o: openRec ? deco(openRec) : {},
