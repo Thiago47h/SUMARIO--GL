@@ -121,7 +121,7 @@
 <textarea value="{{ f.tarefa }}" sc-camel-on-change="{{ setTarefa }}" rows="3" placeholder="Ex.: Exercícios 1 a 5, página 42" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Observações / Ocorrências <span style="color:var(--color-neutral-700)">(opcional)</span>
-<textarea value="{{ f.obs }}" sc-camel-on-change="{{ setObs }}" rows="3" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
+<textarea value="{{ f.obs }}" sc-camel-on-change="{{ setObs }}" rows="3" placeholder="Ex.: Links de apoio para as aulas, como vídeos, slides ou atividades online." style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
 <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
 <p style="margin:0;font-size:15px;color:var(--color-accent-2-700)">{{ formError }}</p>
