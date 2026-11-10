@@ -67,7 +67,7 @@ class Component extends DCLogic {
   state = (() => {
     let records = SEED;
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(s) && s.length) records = s; } catch (e) {}
-    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { professor: '', turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
+    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { professor: '', turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'boxes', openId: null, toast: '', splash: '', rise: false };
   })();
 
   persist(records) { try { localStorage.setItem(KEY, JSON.stringify(records)); } catch (e) {} }
@@ -238,7 +238,7 @@ class Component extends DCLogic {
       toggleAll: () => this.setState(st => { const ids = filtered.map(r => r.id); return { selected: allOn ? st.selected.filter(id => !ids.includes(id)) : [...new Set([...st.selected, ...ids])] }; }),
       selectedLabel: nSel ? nSel + (nSel === 1 ? ' selecionado' : ' selecionados') : 'Nenhum selecionado',
       noSelection: nSel === 0, printOpacity: nSel ? 1 : 0.45,
-      goPrint: () => { if (nSel) this.go('print', { printIds: [...s.selected] }); },
+      goPrint: () => { if (nSel) this.go('print', { printFormat: 'boxes', printIds: [...s.selected] }); },
       rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoord: e => this.saveCoord(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
@@ -256,7 +256,7 @@ class Component extends DCLogic {
       closeOpen: () => this.setState({ openId: null }),
       stop: e => e.stopPropagation(),
       editOpen: () => this.edit(s.openId),
-      printOpen: () => this.go('print', { printIds: [s.openId] }),
+      printOpen: () => this.go('print', { printFormat: 'boxes', printIds: [s.openId] }),
       toast: s.toast,
     };
   }
