@@ -115,14 +115,12 @@ body{background:#f4ecd9}
 }
 .welcome-greeting span {
   display: block;
-}
-.welcome-greeting[data-greeting-animation="greetingDrop"] span {
-  animation: greetingDrop 620ms cubic-bezier(.22, 1, .36, 1) 470ms both;
+  animation: greetingDrop 850ms cubic-bezier(.2, .75, .25, 1) both;
 }
 @keyframes greetingDrop {
-  from { opacity: 0; transform: translateY(-30px); }
+  from { opacity: 0; transform: translateY(-72px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .welcome-greeting[data-greeting-animation] span { animation: none; }
+  .welcome-greeting span { animation: none; }
 }

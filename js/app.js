@@ -143,23 +143,15 @@ class Component extends DCLogic {
           this.setState({ loginError: 'Informe um e-mail válido e a senha.' });
           return;
         }
-        if (s.splash) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          this.go('home');
-          return;
-        }
-        this.setState({ splash: 'center', rise: false });
-        setTimeout(() => this.go('home', { splash: 'fly', rise: true }), 700);
-        setTimeout(() => this.setState({ splash: '', rise: false }), 1850);
+        this.go('home', { rise: true });
       },
-      logout: () => this.go('login', { password: '' }),
+      logout: () => this.go('login', { password: '', rise: false }),
       goHome: () => this.go('home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
       goList: () => this.go('list'),
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
 
       teacherName: 'Profª ' + TEACHER, teacherFirst: 'Ana Beatriz',
-      greetingAnimation: s.rise ? 'greetingDrop' : 'none',
       greeting: hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite',
       todayLabel: WD[td.getDay()] + ', ' + td.getDate() + ' de ' + MO[td.getMonth()],
       todayShort: fmt(TODAY),
