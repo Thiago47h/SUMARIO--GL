@@ -1,21 +1,7 @@
-const COORD_EMAIL = 'claudio.teste@example.com';
-const COORD_PASSWORD = 'claudio123';
-const TEACHER = 'Ana Beatriz Moura';
 const TODAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const WD = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const WDS = ['dom','seg','ter','qua','qui','sex','sáb'];
 const MO = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-const KEY = 'genesis-sumarios-v1';
-const SEED = [
-  { id: 1, date: '2026-11-06', turma: '9º Ano A', disciplina: 'Língua Portuguesa', aulas: [3, 4], paginas: '108 a 111', conteudo: 'Orações subordinadas adverbiais: causais, concessivas e condicionais. Leitura de trechos de notícias e identificação das conjunções.', tarefa: 'Exercícios 1 a 6, página 112 do livro.', obs: '' },
-  { id: 2, date: '2026-11-06', turma: '7º Ano A', disciplina: 'Redação', aulas: [5], conteudo: 'Produção de texto: relato pessoal. Planejamento em tópicos e escrita do primeiro rascunho.', tarefa: 'Terminar o rascunho do relato (mín. 15 linhas).', obs: 'Três alunos ausentes: Davi, Lívia e Rafael.' },
-  { id: 3, date: '2026-11-05', turma: '8º Ano B', disciplina: 'Literatura', aulas: [2], paginas: '45 a 52', conteudo: 'Leitura compartilhada do conto “A Cartomante”, de Machado de Assis. Discussão sobre narrador e ironia.', tarefa: '', obs: '' },
-  { id: 4, date: '2026-11-04', turma: '9º Ano A', disciplina: 'Língua Portuguesa', aulas: [1, 2], conteudo: 'Revisão de período composto por coordenação. Correção coletiva da tarefa anterior.', tarefa: '', obs: 'Turma participativa; retomar conjunções adversativas na próxima aula.' },
-  { id: 5, date: '2026-11-03', turma: '7º Ano A', disciplina: 'Língua Portuguesa', aulas: [3], paginas: '60 a 63', conteudo: 'Substantivos: classificação (comum, próprio, coletivo). Atividade em duplas com textos jornalísticos.', tarefa: 'Lista de coletivos — folha entregue em sala.', obs: '' },
-  { id: 6, date: '2026-10-30', turma: '8º Ano B', disciplina: 'Redação', aulas: [4, 5], conteudo: 'Texto dissertativo-argumentativo: estrutura da introdução e tese. Análise de redações modelo.', tarefa: 'Escrever uma introdução sobre o tema “uso de celulares na escola”.', obs: '' },
-  { id: 7, date: '2026-10-29', turma: '9º Ano A', disciplina: 'Literatura', aulas: [6], conteudo: 'Modernismo brasileiro: Semana de Arte Moderna de 1922. Leitura de poemas de Oswald de Andrade.', tarefa: '', obs: '' },
-  { id: 8, date: '2026-10-28', turma: '7º Ano A', disciplina: 'Língua Portuguesa', aulas: [1, 2, 3], conteudo: 'Avaliação bimestral de interpretação de texto e gramática (substantivos e adjetivos).', tarefa: '', obs: 'Aluna Sofia fará prova de segunda chamada.' },
-];
 const dp = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); };
 const pad = n => String(n).padStart(2, '0');
 const fmt = iso => { const d = dp(iso); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); };
@@ -64,18 +50,19 @@ function groupPrintRecords(records, monthly) {
 }
 
 class Component extends DCLogic {
-  state = (() => {
-    let records = SEED;
-    try { const s = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(s) && s.length) records = s; } catch (e) {}
-    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { professor: '', turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'boxes', openId: null, toast: '', splash: '', rise: false };
-  })();
+  state = {
+    screen: 'login', coordinator: false, email: '', password: '', loginError: '',
+    records: [], name: '', f: blank(), editingId: null, formError: '',
+    flt: { professor: '', turma: '', disciplina: '', from: '', to: '' },
+    selected: [], printIds: [], printFormat: 'boxes', openId: null, toast: '', splash: '', rise: false,
+  };
 
-  persist(records) { try { localStorage.setItem(KEY, JSON.stringify(records)); } catch (e) {} }
   go(screen, extra) { this.setState({ screen, openId: null, ...(extra || {}) }); window.scrollTo(0, 0); }
   flash(msg) { clearTimeout(this._t); this.setState({ toast: msg }); this._t = setTimeout(() => this.setState({ toast: '' }), 2600); }
   setF(k, v) { this.setState(s => ({ f: { ...s.f, [k]: v }, formError: '' })); }
 
-  save(another) {
+  async save(another) {
+    if (this._writing || this.state.coordinator) return;
     const { f: draft, editingId, records } = this.state;
     const f = { ...draft, turma: draft.turma.trim(), disciplina: draft.disciplina.trim() };
     if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.paginas.trim() || !f.conteudo.trim()) {
@@ -86,10 +73,20 @@ class Component extends DCLogic {
       this.setState({ formError: 'A data final deve ser igual ou posterior à data inicial.' });
       return;
     }
-    let next;
-    if (editingId) next = records.map(r => r.id === editingId ? { ...r, ...f } : r);
-    else next = [{ id: Date.now(), professor: TEACHER, ...f }, ...records];
-    this.persist(next);
+    let saved;
+    this._writing = true;
+    try {
+      saved = await semanarioBackend.save(editingId, f);
+      if (this.state.screen === 'login') return;
+    } catch {
+      this.setState({ formError: 'Não foi possível salvar. Confira a conexão ou entre novamente.' });
+      return;
+    } finally {
+      this._writing = false;
+    }
+    const next = editingId
+      ? records.map(record => record.id === editingId ? { ...saved, coordObservation: record.coordObservation } : record)
+      : [saved, ...records];
     const label = periodLabel(f.date, f.endDate) + ' · ' + f.turma;
     if (another) {
       this.setState({ records: next, f: { ...blank(), date: f.date, endDate: f.endDate, turma: f.turma, disciplina: f.disciplina }, formError: '' });
@@ -107,19 +104,27 @@ class Component extends DCLogic {
     this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
-  saveCoord(id, event) {
+  async saveCoord(id, event) {
     event.preventDefault();
-    if (!this.state.coordinator) return;
+    if (!this.state.coordinator || this._writing) return;
     const coordObservation = String(new FormData(event.currentTarget).get('note') || '').trim();
-    const records = this.state.records.map(record => record.id === id ? { ...record, coordObservation } : record);
-    this.persist(records);
-    this.setState({ records });
+    this._writing = true;
+    try {
+      await semanarioBackend.saveNote(id, coordObservation);
+      if (this.state.screen === 'login') return;
+      this.setState(state => ({ records: state.records.map(record => record.id === id ? { ...record, coordObservation } : record) }));
+    } catch {
+      this.flash('Não foi possível salvar a observação. Confira a conexão ou entre novamente.');
+      return;
+    } finally {
+      this._writing = false;
+    }
     this.flash('Observação da coordenação atualizada.');
   }
 
   filtered() {
     const { records, flt, coordinator } = this.state;
-    return records.filter(r => (!coordinator || !flt.professor || (r.professor || TEACHER) === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
+    return records.filter(r => (!coordinator || !flt.professor || r.professor === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
   }
 
   renderVals() {
@@ -174,42 +179,50 @@ class Component extends DCLogic {
       email: s.email, password: s.password, loginError: s.loginError,
       onEmail: val(v => this.setState({ email: v, loginError: '' })),
       onPassword: val(v => this.setState({ password: v, loginError: '' })),
-      onLogin: e => {
+      onLogin: async e => {
         e.preventDefault();
+        if (this._signingIn || s.splash) return;
         if (!s.email.includes('@') || !s.password) {
           this.setState({ loginError: 'Informe um e-mail válido e a senha.' });
           return;
         }
-        const coordinator = s.email.trim().toLowerCase() === COORD_EMAIL;
+        this._signingIn = true;
+        let account;
+        try {
+          account = await semanarioBackend.login(s.email.trim(), s.password);
+        } catch {
+          this.setState({ loginError: 'Não foi possível entrar. Confira os dados ou fale com a secretaria.' });
+          return;
+        } finally {
+          this._signingIn = false;
+        }
+        const coordinator = account.profile.role === 'director';
+        const profile = { records: account.records, coordinator, name: account.profile.name, password: '' };
         if (coordinator) {
-          if (s.password !== COORD_PASSWORD) {
-            this.setState({ loginError: 'Senha de teste incorreta.' });
-            return;
-          }
-          this.go('coordHome', { coordinator: true });
+          this.go('coordHome', profile);
           return;
         }
-        if (s.splash) return;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          this.go('home');
+          this.go('home', profile);
           return;
         }
         this.setState({ splash: 'center', rise: false });
-        setTimeout(() => this.go('home', { splash: 'fly', rise: true }), 700);
+        setTimeout(() => this.go('home', { ...profile, splash: 'fly', rise: true }), 700);
         this._splashEnd = setTimeout(() => this.setState({ splash: '' }), 1500);
         this._riseEnd = setTimeout(() => this.setState({ rise: false }), 2300);
       },
       logout: () => {
         clearTimeout(this._splashEnd);
         clearTimeout(this._riseEnd);
-        this.go('login', { password: '', coordinator: false, splash: '', rise: false, selected: [] });
+        semanarioBackend.logout();
+        this.go('login', { email: '', password: '', coordinator: false, splash: '', rise: false, records: [], name: '', selected: [], printIds: [], flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } });
       },
       goHome: () => this.go(s.coordinator ? 'coordHome' : 'home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
       goList: () => this.go('list'),
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
 
-      teacherName: 'Profª ' + TEACHER, teacherFirst: 'Ana Beatriz',
+      teacherName: [...new Set(printRecs.map(r => r.professor))].join(', ') || s.name, teacherFirst: s.name.split(' ')[0],
       greetOnEntry: s.rise ? "yes" : "no",
       greeting: hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite',
       todayLabel: WD[td.getDay()] + ', ' + td.getDate() + ' de ' + MO[td.getMonth()],
@@ -230,7 +243,7 @@ class Component extends DCLogic {
       onSaveAnother: () => this.save(true),
       onCancel: () => this.go(s.editingId ? 'list' : 'home', { editingId: null, f: blank(), formError: '' }),
 
-      professores: [...new Set(s.records.map(r => r.professor || TEACHER))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+      professores: [...new Set(s.records.map(r => r.professor))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
       flt: s.flt, fProfessor: setFlt('professor'), fTurma: setFlt('turma'), fDisc: setFlt('disciplina'), fFrom: setFlt('from'), fTo: setFlt('to'),
       hasFilters, clearFilters: () => this.setState({ flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } }),
       filteredCount: filtered.length, noRows: filtered.length === 0,
