@@ -159,6 +159,7 @@ class Component extends DCLogic {
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
 
       teacherName: 'Profª ' + TEACHER, teacherFirst: 'Ana Beatriz',
+      greetingAnimation: s.rise ? 'greetingDrop' : 'none',
       greeting: hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite',
       todayLabel: WD[td.getDay()] + ', ' + td.getDate() + ' de ' + MO[td.getMonth()],
       todayShort: fmt(TODAY),
