@@ -11,7 +11,6 @@ button,input,select,textarea{font-family:inherit}
 @keyframes riseIn{from{opacity:0;transform:translateY(22px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
 @media (prefers-reduced-motion:reduce){.splash,.splash *,.rise{animation:none !important;transition:none !important}}
 @media print{
-body{background:#f4ecd9}
 [data-print-hide]{display:none !important}
 [data-print-wrap]{padding:0 !important;max-width:none !important}
 [data-print-page]{box-shadow:none !important;max-width:none !important;min-height:0 !important;padding:0 !important}
@@ -88,10 +87,13 @@ body{background:#f4ecd9}
   }
   .print-compact-scroll { overflow: visible; }
   .print-compact-table { min-width: 0; }
-  html, body, #dc-root, #dc-root > div, [data-print-wrap], [data-print-page] {
-    background: transparent !important;
+  html, body, #dc-root, [data-app-shell], [data-print-wrap], [data-print-page] {
+    background: #fff !important;
+    color: #000 !important;
   }
-  #dc-root > div:has([data-print-wrap]) { min-height: 0 !important; }
+  [data-app-shell] { min-height: 0 !important; }
+  [data-print-page] * { color: #000 !important; }
+  [data-print-page] img { filter: grayscale(100%); }
 }
 
 .welcome-action {
