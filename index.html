@@ -56,7 +56,7 @@
 <main data-screen-label="02 Início" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-8)">
 <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px">
 <span style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">{{ todayLabel }}</span>
-<h1 class="welcome-greeting"><span>{{ greeting }}, {{ teacherFirst }}.</span></h1>
+<h1 class="welcome-greeting" data-greet-on-entry="{{ greetOnEntry }}"><span>{{ greeting }}, {{ teacherFirst }}.</span></h1>
 <p style="margin:0;font-size:18px;color:var(--color-neutral-700);text-wrap:pretty">Você tem {{ totalCount }} semanários salvos. Registre a aula de hoje ou consulte os anteriores.</p>
 <button class="welcome-action" sc-camel-on-click="{{ goCreate }}">+ Criar semanário</button>
 </div>
