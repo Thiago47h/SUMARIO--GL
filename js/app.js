@@ -106,6 +106,17 @@ class Component extends DCLogic {
     this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
+  saveCoordObservation(id, event) {
+    event.preventDefault();
+    const note = String(new FormData(event.currentTarget).get('coordObservation') || '').trim();
+    const records = this.state.records.map(record => record.id === id
+      ? { ...record, coordObservation: note }
+      : record);
+    this.persist(records);
+    this.setState({ records });
+    this.flash(note ? 'Observação da coordenação salva.' : 'Observação da coordenação removida.');
+  }
+
   filtered() {
     const { records, flt } = this.state;
     return records.filter(r => (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
@@ -209,7 +220,7 @@ class Component extends DCLogic {
       selectedLabel: nSel ? nSel + (nSel === 1 ? ' selecionado' : ' selecionados') : 'Nenhum selecionado',
       noSelection: nSel === 0, printOpacity: nSel ? 1 : 0.45,
       goPrint: () => { if (nSel) this.go('print', { printIds: [...s.selected] }); },
-      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
+      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoordObservation: e => this.saveCoordObservation(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,
