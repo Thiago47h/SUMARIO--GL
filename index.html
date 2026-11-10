@@ -87,8 +87,9 @@
 <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Campos com * são obrigatórios.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--space-4)">
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Data *
-<input type="date" value="{{ f.date }}" sc-camel-on-change="{{ setDate }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Semana *
+<input type="date" value="{{ f.date }}" sc-camel-on-change="{{ setWeek }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
+<small aria-live="polite">Segunda a sexta · {{ formWeek }}</small>
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma *
 <sc-raw-select value="{{ f.turma }}" sc-camel-on-change="{{ setTurma }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
