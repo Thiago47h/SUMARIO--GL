@@ -244,9 +244,7 @@ Selecionar todos ({{ filteredCount }})
 </sc-raw-select>
 </label>
 <span style="margin-left:auto;font-size:14px;color:var(--color-neutral-700)">A4 {{ printOrientation }} · {{ printCount }} registros</span>
-<sc-if value="{{ isCoordinator }}">
 <button sc-camel-on-click="{{ doPrint }}" style="min-height:48px;padding:0 var(--space-6);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 16px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Imprimir / Salvar em PDF</button>
-</sc-if>
 </div>
 <article data-print-page="true" data-print-format="{{ printFormat }}" style="width:100%;max-width:794px;min-height:1123px;margin:0 auto;padding:clamp(24px,7vw,64px) clamp(20px,7vw,68px);background:#f4ecd9;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:var(--space-6)">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-3)">
