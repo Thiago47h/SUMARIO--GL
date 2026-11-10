@@ -88,7 +88,10 @@ body{background:#f4ecd9}
   }
   .print-compact-scroll { overflow: visible; }
   .print-compact-table { min-width: 0; }
-  body, [data-print-page] { background: white !important; }
+  html, body, #dc-root, #dc-root > div, [data-print-wrap], [data-print-page] {
+    background: transparent !important;
+  }
+  #dc-root > div:has([data-print-wrap]) { min-height: 0 !important; }
 }
 
 .welcome-action {
