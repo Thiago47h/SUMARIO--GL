@@ -134,3 +134,15 @@ button,input,select,textarea{font-family:inherit}
   from { opacity: 0; transform: translateY(-48px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.print-boxes { display: grid; gap: 14px; }
+.print-box {
+  border: 1px solid #555;
+  padding: 12px;
+  break-inside: avoid;
+  overflow-wrap: anywhere;
+}
+.print-box h2 { margin: 0; font-size: 17px; }
+.print-box p { margin: 4px 0 0; }
+.print-box-fields { display: grid; gap: 6px; margin-top: 9px; }
+.print-box-fields > div { border: 1px solid #777; padding: 6px 8px; }
