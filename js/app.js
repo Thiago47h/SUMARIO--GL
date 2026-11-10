@@ -164,6 +164,10 @@ class Component extends DCLogic {
       splashTf: s.splash === 'fly' ? 'translate(0,-50%)' : 'translate(-50%,-50%)',
       isLogin: s.screen === 'login', notLogin: s.screen !== 'login',
       isCoordinator: s.coordinator,
+      isCoordHome: s.screen === 'coordHome',
+      coordTotal: s.records.length,
+      coordClasses: new Set(s.records.map(record => record.turma)).size,
+      coordNotes: s.records.filter(record => record.coordObservation?.trim()).length,
       isTeacher: !s.coordinator,
       listTitle: s.coordinator ? 'Coordenação e Direção' : 'Semanários salvos',
       isHome: s.screen === 'home', isCreate: s.screen === 'create', isList: s.screen === 'list', isPrint: s.screen === 'print',
@@ -182,7 +186,7 @@ class Component extends DCLogic {
             this.setState({ loginError: 'Senha de teste incorreta.' });
             return;
           }
-          this.go('list', { coordinator: true });
+          this.go('coordHome', { coordinator: true });
           return;
         }
         if (s.splash) return;
@@ -200,7 +204,7 @@ class Component extends DCLogic {
         clearTimeout(this._riseEnd);
         this.go('login', { password: '', coordinator: false, splash: '', rise: false, selected: [] });
       },
-      goHome: () => this.go(s.coordinator ? 'list' : 'home'),
+      goHome: () => this.go(s.coordinator ? 'coordHome' : 'home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
       goList: () => this.go('list'),
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
