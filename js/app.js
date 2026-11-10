@@ -97,6 +97,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state;
+    const hour = new Date().getHours();
     const val = fn => e => fn(e.target.value);
     const filtered = this.filtered();
     const sel = new Set(s.selected);
@@ -136,7 +137,21 @@ class Component extends DCLogic {
       email: s.email, password: s.password, loginError: s.loginError,
       onEmail: val(v => this.setState({ email: v, loginError: '' })),
       onPassword: val(v => this.setState({ password: v, loginError: '' })),
-      onLogin: e => { e.preventDefault(); if (!s.email.includes('@') || !s.password) { this.setState({ loginError: 'Informe um e-mail válido e a senha.' }); return; } if (s.splash) return; [this._s0, this._s1, this._s2, this._s3].forEach(clearTimeout); this.setState({ splash: 'center', rise: false }); this._s0 = setTimeout(() => this.go('home'), 550); this._s1 = setTimeout(() => this.setState({ splash: 'fly', rise: true }), 2300); this._s2 = setTimeout(() => this.setState({ splash: '' }), 3250); this._s3 = setTimeout(() => this.setState({ rise: false }), 4800); },
+      onLogin: e => {
+        e.preventDefault();
+        if (!s.email.includes('@') || !s.password) {
+          this.setState({ loginError: 'Informe um e-mail válido e a senha.' });
+          return;
+        }
+        if (s.splash) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.go('home');
+          return;
+        }
+        this.setState({ splash: 'center', rise: false });
+        setTimeout(() => this.go('home', { splash: 'fly', rise: true }), 700);
+        setTimeout(() => this.setState({ splash: '', rise: false }), 1500);
+      },
       logout: () => this.go('login', { password: '' }),
       goHome: () => this.go('home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
@@ -144,10 +159,11 @@ class Component extends DCLogic {
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
 
       teacherName: 'Profª ' + TEACHER, teacherFirst: 'Ana Beatriz',
+      greeting: hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite',
       todayLabel: WD[td.getDay()] + ', ' + td.getDate() + ' de ' + MO[td.getMonth()],
       todayShort: fmt(TODAY),
       totalCount: s.records.length,
-      recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (650 + i * 110) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
+      recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (120 + i * 60) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
 
       f: s.f, turmas: TURMAS, disciplinas: DISCIPLINAS,
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',

@@ -90,3 +90,19 @@ body{background:#f4ecd9}
   .print-compact-table { min-width: 0; }
   body, [data-print-page] { background: white !important; }
 }
+
+.welcome-action {
+  align-self: flex-start;
+  margin-top: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font: 600 16px var(--font-heading);
+  cursor: pointer;
+}
+.welcome-action:hover {
+  background: var(--color-accent-600);
+}

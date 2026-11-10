@@ -53,10 +53,11 @@
 
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="02 Início" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-8)">
-<div class="rise" style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px;animation-name:{{ riseName }};animation-duration:800ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);animation-fill-mode:both;animation-delay:400ms">
+<div class="rise" style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px;animation-name:{{ riseName }};animation-duration:450ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);animation-fill-mode:both;animation-delay:60ms">
 <span style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">{{ todayLabel }}</span>
-<h1 style="margin:0;font-size:clamp(34px,6vw,52px)">Bom dia, {{ teacherFirst }}.</h1>
+<h1 style="margin:0;font-size:clamp(34px,6vw,52px)">{{ greeting }}, {{ teacherFirst }}.</h1>
 <p style="margin:0;font-size:18px;color:var(--color-neutral-700);text-wrap:pretty">Você tem {{ totalCount }} semanários salvos. Registre a aula de hoje ou consulte os anteriores.</p>
+<button class="welcome-action" sc-camel-on-click="{{ goCreate }}">+ Criar semanário</button>
 </div>
 <section style="display:flex;flex-direction:column;gap:var(--space-4)">
 <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--space-2) var(--space-4)">
@@ -65,7 +66,7 @@
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:var(--space-4)">
 <sc-for list="{{ recent }}" as="r" hint-placeholder-count="4">
-<button class="rise" sc-camel-on-click="{{ r.open }}" style="display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-surface);text-align:left;cursor:pointer;color:inherit;font:inherit;animation-name:{{ riseName }};animation-duration:800ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);animation-fill-mode:both;animation-delay:{{ r.riseDelay }}" style-hover="box-shadow:var(--shadow-md)">
+<button class="rise" sc-camel-on-click="{{ r.open }}" style="display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-surface);text-align:left;cursor:pointer;color:inherit;font:inherit;animation-name:{{ riseName }};animation-duration:450ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);animation-fill-mode:both;animation-delay:{{ r.riseDelay }}" style-hover="box-shadow:var(--shadow-md)">
 <span style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-700)">{{ r.turma }} · {{ r.disciplina }}</span>
 <span style="font:600 20px/1.2 var(--font-heading)">{{ r.dateShort }} — {{ r.aulasLabel }}</span>
 <span style="font-size:15px;line-height:1.5;color:var(--color-neutral-800);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ r.conteudo }}</span>
@@ -347,14 +348,14 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 
 <sc-if value="{{ hasSplash }}" hint-placeholder-val="{{ false }}">
-<div class="splash" aria-hidden="true" data-print-hide="true" style="position:fixed;inset:0;z-index:60;background:{{ splashBg }};pointer-events:{{ splashPE }};transition:background 800ms ease 100ms;animation:splashIn 450ms ease backwards">
-<div style="position:absolute;inset:0;overflow:hidden;opacity:{{ splashFx }};transition:opacity 500ms ease">
-<div style="position:absolute;left:50%;top:50%;width:min(640px,92vw);height:min(640px,92vw);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--color-accent) 24%,transparent) 0%,color-mix(in srgb,var(--color-accent-2) 9%,transparent) 45%,transparent 70%);transform:translate(-50%,-50%);animation:glowIn 1400ms cubic-bezier(.2,.7,.2,1) 200ms both"></div>
-<div style="position:absolute;left:50%;top:50%;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--color-accent);transform:translate(-50%,-50%);animation:ringOut 1800ms ease-out 500ms both"></div>
-<div style="position:absolute;left:50%;top:50%;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--color-accent-2);transform:translate(-50%,-50%);animation:ringOut 1800ms ease-out 1000ms both"></div>
-<div style="position:absolute;left:50%;top:calc(50% + 96px);white-space:nowrap;text-transform:uppercase;font:600 14px var(--font-heading);color:var(--color-neutral-700);transform:translate(-50%,0);letter-spacing:.18em;animation:titleIn 900ms ease 800ms both">Semanário de Aulas</div>
+<div class="splash" aria-hidden="true" data-print-hide="true" style="position:fixed;inset:0;z-index:60;background:{{ splashBg }};pointer-events:{{ splashPE }};transition:background 430ms ease;animation:splashIn 200ms ease backwards">
+<div style="position:absolute;inset:0;overflow:hidden;opacity:{{ splashFx }};transition:opacity 260ms ease">
+<div style="position:absolute;left:50%;top:50%;width:min(640px,92vw);height:min(640px,92vw);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--color-accent) 24%,transparent) 0%,color-mix(in srgb,var(--color-accent-2) 9%,transparent) 45%,transparent 70%);transform:translate(-50%,-50%);animation:glowIn 550ms cubic-bezier(.2,.7,.2,1) 80ms both"></div>
+<div style="position:absolute;left:50%;top:50%;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--color-accent);transform:translate(-50%,-50%);animation:ringOut 750ms ease-out 180ms both"></div>
+<div style="position:absolute;left:50%;top:50%;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--color-accent-2);transform:translate(-50%,-50%);animation:ringOut 750ms ease-out 320ms both"></div>
+<div style="position:absolute;left:50%;top:calc(50% + 96px);white-space:nowrap;text-transform:uppercase;font:600 14px var(--font-heading);color:var(--color-neutral-700);transform:translate(-50%,0);letter-spacing:.18em;animation:titleIn 350ms ease 180ms both">Semanário de Aulas</div>
 </div>
-<img src="assets/logo.png" alt="" style="position:fixed;left:{{ splashLeft }};top:{{ splashTop }};height:{{ splashH }};width:auto;transform:{{ splashTf }};mix-blend-mode:multiply;transition:left 900ms cubic-bezier(.65,0,.2,1),top 900ms cubic-bezier(.65,0,.2,1),height 900ms cubic-bezier(.65,0,.2,1),transform 900ms cubic-bezier(.65,0,.2,1);animation:splashLogoIn 1000ms cubic-bezier(.2,.7,.2,1) 250ms backwards">
+<img src="assets/logo.png" alt="" style="position:fixed;left:{{ splashLeft }};top:{{ splashTop }};height:{{ splashH }};width:auto;transform:{{ splashTf }};mix-blend-mode:multiply;transition:left 540ms cubic-bezier(.65,0,.2,1),top 540ms cubic-bezier(.65,0,.2,1),height 540ms cubic-bezier(.65,0,.2,1),transform 540ms cubic-bezier(.65,0,.2,1);animation:splashLogoIn 400ms cubic-bezier(.2,.7,.2,1) 50ms backwards">
 </div>
 </sc-if>
 
