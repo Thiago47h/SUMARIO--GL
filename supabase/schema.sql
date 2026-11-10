@@ -3,9 +3,9 @@ create table public.semanario_profiles (
  name text not null check (length(trim(name)) > 0),
  role text not null check (role in ('teacher','director'))
 );
-create function public.semanario_author_name() returns text language sql stable security invoker set search_path = '' as $
+create function public.semanario_author_name() returns text language sql stable security invoker set search_path = '' as $$
  select name from public.semanario_profiles where user_id = (select auth.uid())
-$;
+$$;
 revoke all on function public.semanario_author_name() from public, anon;
 grant execute on function public.semanario_author_name() to authenticated;
 create table public.semanario_plans (
