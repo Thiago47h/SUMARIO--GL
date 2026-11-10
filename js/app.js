@@ -25,16 +25,15 @@ const weekStart = iso => {
   monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
   return isoDate(monday);
 };
-const weekRange = iso => {
-  if (!iso) return 'Escolha uma data para definir a semana.';
-  const monday = weekStart(iso);
-  const friday = dp(monday);
+const weekEnd = iso => {
+  const friday = dp(weekStart(iso));
   friday.setDate(friday.getDate() + 4);
-  return fmt(monday) + ' a ' + fmt(isoDate(friday));
+  return isoDate(friday);
 };
+const periodLabel = (start, end) => end && end !== start ? fmt(start) + ' a ' + fmt(end) : fmt(start);
 const aulasLabel = a => { const s = [...a].sort((x, y) => x - y).map(n => n + 'ª'); if (!s.length) return ''; if (s.length === 1) return s[0] + ' aula'; return s.slice(0, -1).join(', ') + ' e ' + s[s.length - 1] + ' aulas'; };
-const blank = () => ({ date: weekStart(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', conteudo: '', tarefa: '', obs: '' });
-const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: fmt(r.date), dateLong: WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
+const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', conteudo: '', tarefa: '', obs: '' });
+const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: periodLabel(r.date, r.endDate), dateLong: r.endDate && r.endDate !== r.date ? periodLabel(r.date, r.endDate) : WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
 function groupPrintRecords(records, monthly) {
@@ -78,17 +77,21 @@ class Component extends DCLogic {
 
   save(another) {
     const { f, editingId, records } = this.state;
-    if (!f.date || !f.turma || !f.disciplina || !f.aulas.length || !f.conteudo.trim()) {
+    if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.conteudo.trim()) {
       this.setState({ formError: 'Preencha semana, turma, disciplina, aula(s) e conteúdo trabalhado.' });
+      return;
+    }
+    if (f.endDate < f.date) {
+      this.setState({ formError: 'A data final deve ser igual ou posterior à data inicial.' });
       return;
     }
     let next;
     if (editingId) next = records.map(r => r.id === editingId ? { ...r, ...f } : r);
     else next = [{ id: Date.now(), ...f }, ...records];
     this.persist(next);
-    const label = fmt(f.date) + ' · ' + f.turma;
+    const label = periodLabel(f.date, f.endDate) + ' · ' + f.turma;
     if (another) {
-      this.setState({ records: next, f: { ...blank(), date: f.date, turma: f.turma, disciplina: f.disciplina }, formError: '' });
+      this.setState({ records: next, f: { ...blank(), date: f.date, endDate: f.endDate, turma: f.turma, disciplina: f.disciplina }, formError: '' });
       window.scrollTo(0, 0);
       this.flash('Semanário salvo (' + label + '). Preencha o próximo.');
     } else {
@@ -100,12 +103,12 @@ class Component extends DCLogic {
   edit(id) {
     const r = this.state.records.find(x => x.id === id);
     if (!r) return;
-    this.go('create', { editingId: id, f: { date: r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
+    this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
   filtered() {
     const { records, flt } = this.state;
-    return records.filter(r => (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || r.date >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
+    return records.filter(r => (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
   }
 
   renderVals() {
@@ -121,10 +124,11 @@ class Component extends DCLogic {
     const printRecs = s.records.filter(r => s.printIds.includes(r.id)).sort((a, b) => a.date.localeCompare(b.date) || Math.min(...a.aulas) - Math.min(...b.aulas)).map(deco);
     const uniq = k => [...new Set(printRecs.map(r => r[k]))];
     const tU = uniq('turma'), dU = uniq('disciplina');
+    const lastPrintDate = printRecs.reduce((last, r) => (r.endDate || r.date) > last ? (r.endDate || r.date) : last, '');
     const multi = tU.length > 1 || dU.length > 1;
     const pm = {
       turma: tU.join(', ') || '—', disciplina: dU.join(', ') || '—',
-      periodo: printRecs.length ? (printRecs[0].date === printRecs[printRecs.length - 1].date ? fmt(printRecs[0].date) : fmt(printRecs[0].date) + ' a ' + fmt(printRecs[printRecs.length - 1].date)) : '—',
+      periodo: printRecs.length ? periodLabel(printRecs[0].date, lastPrintDate) : '—',
     };
     const openRec = s.openId ? s.records.find(r => r.id === s.openId) : null;
     const td = dp(TODAY);
@@ -188,8 +192,8 @@ class Component extends DCLogic {
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
       saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar semanário',
       notEditing: !s.editingId, formError: s.formError,
-      formWeek: weekRange(s.f.date),
-      setWeek: val(v => this.setF('date', v ? weekStart(v) : '')), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
+      setWeek: val(v => this.setF('date', v)),
+      setWeekEnd: val(v => this.setF('endDate', v)), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
       setPaginas: val(v => this.setF('paginas', v)), setConteudo: val(v => this.setF('conteudo', v)), setTarefa: val(v => this.setF('tarefa', v)), setObs: val(v => this.setF('obs', v)),
       aulaChips: [1, 2, 3, 4, 5, 6, 7].map(n => { const on = s.f.aulas.includes(n); return { label: n + 'ª aula', on, border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent)' : 'var(--color-surface)', fg: on ? 'var(--color-bg)' : 'var(--color-text)', toggle: () => this.setF('aulas', on ? s.f.aulas.filter(x => x !== n) : [...s.f.aulas, n]) }; }),
       aulasPreview: s.f.aulas.length ? 'Selecionado: ' + aulasLabel(s.f.aulas) : '',
