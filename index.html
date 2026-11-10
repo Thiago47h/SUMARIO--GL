@@ -7,6 +7,14 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/app.css?v=6">
 <script defer src="js/bootstrap.js"></script>
+<style>
+.login-layout { flex: 1; display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 440px); justify-content: center; align-items: center; gap: clamp(24px, 6vw, 88px); padding: clamp(20px, 5vw, 64px); }
+.login-photo { display: block; width: 100%; height: min(72vh, 620px); object-fit: cover; object-position: center 40%; border-radius: var(--radius-md); }
+@media (max-width: 680px) {
+  .login-layout { grid-template-columns: minmax(0, 400px); gap: 16px; }
+  .login-photo { grid-row: 1; height: clamp(145px, 34vw, 220px); object-position: center 33%; }
+}
+</style>
 </head>
 <body>
 <x-dc>
@@ -14,7 +22,7 @@
 <div data-app-shell="true" style="min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg,#eadfc6);color:var(--color-text,#201e1d);font-family:var(--font-body);font-size:16px">
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
-<div data-screen-label="01 Login" style="flex:1;display:flex;align-items:center;padding:var(--space-8) clamp(20px,8vw,120px)">
+<div data-screen-label="01 Login" class="login-layout">
 <form sc-camel-on-submit="{{ onLogin }}" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:var(--space-4);opacity:{{ loginOp }};filter:blur({{ loginBlur }});transform:translateY({{ loginY }});transition:opacity 450ms ease,filter 450ms ease,transform 450ms ease">
 <div style="width:220px;height:110px;display:flex;align-items:center"><img src="assets/logo.png?v=2" alt="Colégio Gênesis Life" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply"></div>
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
@@ -33,6 +41,7 @@
 <button type="submit" style="min-height:50px;border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 17px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)" style-active="background:var(--color-accent-700)">Entrar</button>
 <p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Esqueceu a senha? Fale com a secretaria do colégio.</p>
 </form>
+<img class="login-photo" src="assets/entrada.webp" alt="Professora e alunas em uma atividade no Colégio Gênesis Life">
 </div>
 </sc-if>
 
