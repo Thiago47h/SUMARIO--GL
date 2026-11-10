@@ -240,6 +240,7 @@ class Component extends DCLogic {
       setPrintFormat: val(printFormat => this.setState({ printFormat })),
       groupedPrint: s.printFormat === 'weekly' || s.printFormat === 'monthly',
       compactPrint: s.printFormat === 'compact',
+      boxesPrint: s.printFormat === 'boxes',
       detailedPrint: s.printFormat === 'detailed',
       printOrientation: s.printFormat === 'compact' ? 'paisagem' : 'retrato',
       printGroups: groupPrintRecords(printRecs, s.printFormat === 'monthly'),
