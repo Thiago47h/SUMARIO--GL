@@ -19,7 +19,7 @@
 <div style="width:220px;height:110px;display:flex;align-items:center"><img src="assets/logo.png?v=2" alt="Colégio Gênesis Life" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply"></div>
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
 <h1 style="margin:0;font-size:42px">Semanário</h1>
-<p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Entre com seu e-mail de professor.</p>
+<p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Entre com seu e-mail de professor ou da coordenação.</p>
 </div>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">E-mail
 <input type="email" value="{{ email }}" sc-camel-on-change="{{ onEmail }}" placeholder="nome@example.com" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
@@ -44,7 +44,9 @@
 <span style="font:600 18px var(--font-heading);padding-left:var(--space-3);box-shadow:-1px 0 0 var(--color-divider)">Semanário</span>
 </button>
 <nav style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">
+<sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ goCreate }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">+ Criar semanário</button>
+</sc-if>
 <button sc-camel-on-click="{{ goList }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:{{ listNavBg }};color:var(--color-text);font:600 15px var(--font-heading);cursor:pointer" style-hover="background:var(--color-neutral-200)">Ver semanários</button>
 <button sc-camel-on-click="{{ logout }}" style="min-height:44px;padding:0 var(--space-2);border:none;background:none;color:var(--color-neutral-700);font:400 14px var(--font-body);cursor:pointer" style-hover="color:var(--color-accent-700)">Sair</button>
 </nav>
@@ -144,7 +146,7 @@
 <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="04 Ver semanários" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-6)">
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
-<h1 style="margin:0;font-size:clamp(32px,5vw,42px)">Semanários salvos</h1>
+<h1 style="margin:0;font-size:clamp(32px,5vw,42px)">{{ listTitle }}</h1>
 <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Filtre, abra ou edite. Marque os registros que deseja imprimir.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:var(--space-3);align-items:end">
@@ -179,6 +181,7 @@ Selecionar todos ({{ filteredCount }})
 <button sc-camel-on-click="{{ goPrint }}" disabled="{{ noSelection }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer;opacity:{{ printOpacity }}" style-hover="background:var(--color-accent-600)">Prévia de impressão</button>
 </div>
 <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+<sc-if value="{{ isCoordinator }}"><p style="margin:0">Professora de demonstração · {{ teacherName }}</p></sc-if>
 <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:{{ r.rowBg }};box-shadow:{{ r.rowRing }}">
 <button sc-camel-on-click="{{ r.toggle }}" aria-label="Selecionar para impressão" style="width:44px;height:44px;margin:-10px 0 0 -10px;flex:none;display:grid;place-items:center;background:none;border:none;cursor:pointer;padding:0">
@@ -199,12 +202,24 @@ Selecionar todos ({{ filteredCount }})
 <span style="font-size:15px;line-height:1.5;color:var(--color-neutral-800);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ r.conteudo }}</span>
 <div style="display:grid;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--color-divider)">
 <strong style="font-size:14px">Observação da coordenação</strong>
+<sc-if value="{{ isTeacher }}">
+<sc-if value="{{ r.coordObservation }}">
 <p style="margin:0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere">{{ r.coordObservation }}</p>
+</sc-if>
+</sc-if>
+<sc-if value="{{ isCoordinator }}">
+<form sc-camel-on-submit="{{ r.saveCoord }}" style="display:grid;gap:6px">
+<textarea name="note" aria-label="Observação da coordenação" sc-camel-default-value="{{ r.coordObservation }}" rows="2" style="width:100%;resize:vertical;font:inherit"></textarea>
+<button type="submit" style="justify-self:start;min-height:36px;cursor:pointer">Salvar observação</button>
+</form>
+</sc-if>
 </div>
 </div>
 <div style="display:flex;gap:var(--space-1);margin-left:auto">
 <button sc-camel-on-click="{{ r.open }}" style="min-height:40px;padding:0 var(--space-3);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Abrir</button>
+<sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ r.edit }}" style="min-height:40px;padding:0 var(--space-3);border:none;border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:var(--color-accent-700);cursor:pointer" style-hover="background:var(--color-accent-100)">Editar</button>
+</sc-if>
 </div>
 </div>
 </sc-for>
@@ -348,7 +363,9 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)">
 <button sc-camel-on-click="{{ closeOpen }}" style="min-height:44px;padding:0 var(--space-3);border:none;background:none;font:400 15px var(--font-body);color:var(--color-neutral-700);cursor:pointer">Fechar</button>
 <button sc-camel-on-click="{{ printOpen }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 15px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Imprimir</button>
+<sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ editOpen }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Editar</button>
+</sc-if>
 </div>
 </div>
 </div>
