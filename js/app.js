@@ -2,8 +2,6 @@ const COORD_EMAIL = 'claudio.teste@example.com';
 const COORD_PASSWORD = 'claudio123';
 const TEACHER = 'Ana Beatriz Moura';
 const TODAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
-const TURMAS = ['7º Ano A', '8º Ano B', '9º Ano A'];
-const DISCIPLINAS = ['Língua Portuguesa', 'Literatura', 'Redação'];
 const WD = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const WDS = ['dom','seg','ter','qua','qui','sex','sáb'];
 const MO = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -78,7 +76,8 @@ class Component extends DCLogic {
   setF(k, v) { this.setState(s => ({ f: { ...s.f, [k]: v }, formError: '' })); }
 
   save(another) {
-    const { f, editingId, records } = this.state;
+    const { f: draft, editingId, records } = this.state;
+    const f = { ...draft, turma: draft.turma.trim(), disciplina: draft.disciplina.trim() };
     if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.conteudo.trim()) {
       this.setState({ formError: 'Preencha semana, turma, disciplina, aula(s) e conteúdo trabalhado.' });
       return;
@@ -128,6 +127,8 @@ class Component extends DCLogic {
     const hour = new Date().getHours();
     const val = fn => e => fn(e.target.value);
     const filtered = this.filtered();
+    const filterOptions = field => [...new Set(s.records.map(record => record[field]).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }));
     const sel = new Set(s.selected);
     const selInView = filtered.filter(r => sel.has(r.id)).length;
     const allOn = filtered.length > 0 && selInView === filtered.length;
@@ -212,7 +213,7 @@ class Component extends DCLogic {
       totalCount: s.records.length,
       recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (120 + i * 60) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
 
-      f: s.f, turmas: TURMAS, disciplinas: DISCIPLINAS,
+      f: s.f, turmas: filterOptions('turma'), disciplinas: filterOptions('disciplina'),
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
       saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar semanário',
       notEditing: !s.editingId, formError: s.formError,
