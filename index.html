@@ -158,6 +158,14 @@
 <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Filtre, abra ou edite. Marque os registros que deseja visualizar.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:var(--space-3);align-items:end">
+<sc-if value="{{ isCoordinator }}">
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px">Professor
+<sc-raw-select value="{{ flt.professor }}" sc-camel-on-change="{{ fProfessor }}" style="min-height:44px;padding:6px 10px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
+<option value="">Todos os professores</option>
+<sc-for list="{{ professores }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for>
+</sc-raw-select>
+</label>
+</sc-if>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma
 <sc-raw-select value="{{ flt.turma }}" sc-camel-on-change="{{ fTurma }}" style="min-height:44px;padding:6px 10px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
 <option value="">Todas as turmas</option>
