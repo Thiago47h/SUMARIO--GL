@@ -78,8 +78,8 @@ class Component extends DCLogic {
   save(another) {
     const { f: draft, editingId, records } = this.state;
     const f = { ...draft, turma: draft.turma.trim(), disciplina: draft.disciplina.trim() };
-    if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.conteudo.trim()) {
-      this.setState({ formError: 'Preencha semana, turma, disciplina, aula(s) e conteúdo trabalhado.' });
+    if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.paginas.trim() || !f.conteudo.trim()) {
+      this.setState({ formError: 'Preencha semana, turma, disciplina, aula(s), páginas a serem trabalhadas e conteúdo a ser trabalhado.' });
       return;
     }
     if (f.endDate < f.date) {
