@@ -87,9 +87,11 @@
 <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Campos com * são obrigatórios.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--space-4)">
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Semana *
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Semana de *
 <input type="date" value="{{ f.date }}" sc-camel-on-change="{{ setWeek }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
-<small aria-live="polite">Segunda a sexta · {{ formWeek }}</small>
+</label>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Até *
+<input type="date" value="{{ f.endDate }}" sc-camel-on-change="{{ setWeekEnd }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma *
 <sc-raw-select value="{{ f.turma }}" sc-camel-on-change="{{ setTurma }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
@@ -183,7 +185,7 @@ Selecionar todos ({{ filteredCount }})
 <span style="width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-md);border:1.5px solid {{ r.boxBorder }};background:{{ r.boxBg }};color:var(--color-bg);font-size:14px;line-height:1">{{ r.mark }}</span>
 </button>
 <div style="width:92px;flex:none;display:flex;flex-direction:column;gap:2px">
-<span style="font:600 24px/1 var(--font-heading)">{{ r.dayMonth }}</span>
+<span style="font:600 24px/1 var(--font-heading)">{{ r.dateShort }}</span>
 <span style="font-size:13px;color:var(--color-neutral-700)">{{ r.weekdayShort }} · {{ r.year }}</span>
 </div>
 <div style="flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:6px">
@@ -291,7 +293,7 @@ Selecionar todos ({{ filteredCount }})
 <sc-for list="{{ printRows }}" as="p" hint-placeholder-count="4">
 <div style="display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-6);padding:var(--space-4) 0;box-shadow:0 -1px 0 var(--color-divider);break-inside:avoid">
 <div style="width:120px;flex:none;display:flex;flex-direction:column;gap:6px">
-<span style="font:600 30px/1 var(--font-heading)">{{ p.dayMonth }}</span>
+<span style="font:600 30px/1 var(--font-heading)">{{ p.dateShort }}</span>
 <span style="font-size:13px;color:var(--color-neutral-700)">{{ p.weekday }}, {{ p.year }}</span>
 <span style="align-self:flex-start;font:600 12px var(--font-heading);padding:3px 8px;border-radius:var(--radius-sm);background:var(--color-accent-100);color:var(--color-accent-800)">{{ p.aulasLabel }}</span>
 <sc-if value="{{ p.paginas }}" hint-placeholder-val="{{ false }}">
