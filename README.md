@@ -1,4 +1,4 @@
-# Sumário de Aulas | Colégio Gênesis Life
+# Semanário de Aulas | Colégio Gênesis Life
 
 Protótipo com login demonstrativo e registros salvos no navegador.
 

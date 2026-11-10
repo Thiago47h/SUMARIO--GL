@@ -50,10 +50,10 @@ class Component extends DCLogic {
     if (another) {
       this.setState({ records: next, f: { ...blank(), date: f.date, turma: f.turma, disciplina: f.disciplina }, formError: '' });
       window.scrollTo(0, 0);
-      this.flash('Sumário salvo (' + label + '). Preencha o próximo.');
+      this.flash('Semanário salvo (' + label + '). Preencha o próximo.');
     } else {
       this.go('list', { records: next, editingId: null, f: blank() });
-      this.flash(editingId ? 'Alterações salvas.' : 'Sumário salvo: ' + label);
+      this.flash(editingId ? 'Alterações salvas.' : 'Semanário salvo: ' + label);
     }
   }
 
@@ -123,8 +123,8 @@ class Component extends DCLogic {
       recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (650 + i * 110) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
 
       f: s.f, turmas: TURMAS, disciplinas: DISCIPLINAS,
-      formTitle: s.editingId ? 'Editar sumário' : 'Criar sumário',
-      saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar sumário',
+      formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
+      saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar semanário',
       notEditing: !s.editingId, formError: s.formError,
       setDate: val(v => this.setF('date', v)), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
       setPaginas: val(v => this.setF('paginas', v)), setConteudo: val(v => this.setF('conteudo', v)), setTarefa: val(v => this.setF('tarefa', v)), setObs: val(v => this.setF('obs', v)),
