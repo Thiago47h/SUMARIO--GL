@@ -111,7 +111,7 @@
 </div>
 <span style="font-size:14px;color:var(--color-accent-700)">{{ aulasPreview }}</span>
 </fieldset>
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Páginas a serem trabalhadas <span style="color:var(--color-neutral-700)">(opcional)</span>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Páginas a serem trabalhadas *
 <input type="text" value="{{ f.paginas }}" sc-camel-on-change="{{ setPaginas }}" placeholder="Ex.: 112 a 115" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Conteúdo a ser trabalhado *
@@ -120,7 +120,7 @@
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Tarefa de casa prevista <span style="color:var(--color-neutral-700)">(opcional)</span>
 <textarea value="{{ f.tarefa }}" sc-camel-on-change="{{ setTarefa }}" rows="3" placeholder="Ex.: Exercícios 1 a 5, página 42" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Observações <span style="color:var(--color-neutral-700)">(opcional)</span>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Observações / Ocorrências <span style="color:var(--color-neutral-700)">(opcional)</span>
 <textarea value="{{ f.obs }}" sc-camel-on-change="{{ setObs }}" rows="3" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
 <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
@@ -272,7 +272,7 @@ Selecionar todos ({{ filteredCount }})
 <p>{{ lesson.conteudo }}</p>
 <sc-if value="{{ lesson.paginas }}"><p>Páginas a serem trabalhadas — {{ lesson.paginas }}</p></sc-if>
 <sc-if value="{{ lesson.tarefa }}"><p>Tarefa de casa prevista — {{ lesson.tarefa }}</p></sc-if>
-<sc-if value="{{ lesson.obs }}"><p>Observações — {{ lesson.obs }}</p></sc-if>
+<sc-if value="{{ lesson.obs }}"><p>Observações / Ocorrências — {{ lesson.obs }}</p></sc-if>
 </div>
 </sc-for>
 </sc-for>
@@ -312,7 +312,7 @@ Selecionar todos ({{ filteredCount }})
 <div><strong>Conteúdo a ser trabalhado</strong><p>{{ p.conteudo }}</p></div>
 <sc-if value="{{ p.paginas }}"><div><strong>Páginas a serem trabalhadas</strong><p>{{ p.paginas }}</p></div></sc-if>
 <sc-if value="{{ p.tarefa }}"><div><strong>Tarefa de casa prevista</strong><p>{{ p.tarefa }}</p></div></sc-if>
-<sc-if value="{{ p.obs }}"><div><strong>Observações</strong><p>{{ p.obs }}</p></div></sc-if>
+<sc-if value="{{ p.obs }}"><div><strong>Observações / Ocorrências</strong><p>{{ p.obs }}</p></div></sc-if>
 </div>
 </section>
 </sc-for>
@@ -339,7 +339,7 @@ Selecionar todos ({{ filteredCount }})
 <p style="margin:0;font-size:14px;line-height:1.5"><strong style="font-weight:600">Tarefa de casa prevista:</strong> {{ p.tarefa }}</p>
 </sc-if>
 <sc-if value="{{ p.obs }}" hint-placeholder-val="{{ false }}">
-<p style="margin:0;font-size:14px;line-height:1.5;font-style:italic;color:var(--color-neutral-800)"><span style="font-style:normal;font-weight:600">Observações:</span> {{ p.obs }}</p>
+<p style="margin:0;font-size:14px;line-height:1.5;font-style:italic;color:var(--color-neutral-800)"><span style="font-style:normal;font-weight:600">Observações / Ocorrências:</span> {{ p.obs }}</p>
 </sc-if>
 </div>
 </div>
@@ -369,7 +369,7 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Tarefa de casa prevista</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.tarefa }}</p></div>
 </sc-if>
 <sc-if value="{{ o.obs }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Observações</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.obs }}</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Observações / Ocorrências</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.obs }}</p></div>
 </sc-if>
 <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)">
 <button sc-camel-on-click="{{ closeOpen }}" style="min-height:44px;padding:0 var(--space-3);border:none;background:none;font:400 15px var(--font-body);color:var(--color-neutral-700);cursor:pointer">Fechar</button>
