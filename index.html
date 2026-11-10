@@ -96,16 +96,10 @@
 <input type="date" value="{{ f.endDate }}" sc-camel-on-change="{{ setWeekEnd }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma *
-<sc-raw-select value="{{ f.turma }}" sc-camel-on-change="{{ setTurma }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
-<option value="">Escolha a turma</option>
-<sc-for list="{{ turmas }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for>
-</sc-raw-select>
+<input type="text" value="{{ f.turma }}" sc-camel-on-change="{{ setTurma }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" placeholder="Ex.: 8º Ano B">
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Disciplina *
-<sc-raw-select value="{{ f.disciplina }}" sc-camel-on-change="{{ setDisciplina }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
-<option value="">Escolha a disciplina</option>
-<sc-for list="{{ disciplinas }}" as="o" hint-placeholder-count="2"><option value="{{ o }}">{{ o }}</option></sc-for>
-</sc-raw-select>
+<input type="text" value="{{ f.disciplina }}" sc-camel-on-change="{{ setDisciplina }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" placeholder="Ex.: Matemática">
 </label>
 </div>
 <fieldset style="border:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-2)">
