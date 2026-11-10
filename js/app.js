@@ -24,27 +24,31 @@ const blank = () => ({ date: TODAY, turma: '', disciplina: '', aulas: [], pagina
 const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: fmt(r.date), dateLong: WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
-function groupPrintWeeks(records) {
-  const weeks = new Map();
+function groupPrintRecords(records, monthly) {
+  const groups = new Map();
   for (const record of records) {
     const monday = dp(record.date);
     monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
     const friday = new Date(monday);
     friday.setDate(monday.getDate() + 4);
     const label = date => date.toLocaleDateString('pt-BR');
-    const weekKey = monday.getTime() + '|' + record.turma;
-    if (!weeks.has(weekKey)) {
-      weeks.set(weekKey, {
+    const periodKey = monthly ? record.date.slice(0, 7) : monday.getTime();
+    const period = monthly
+      ? MO[Number(record.date.slice(5, 7)) - 1] + ' de ' + record.date.slice(0, 4)
+      : label(monday) + ' a ' + label(friday);
+    const groupKey = periodKey + '|' + record.turma;
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
         turma: record.turma,
-        period: label(monday) + ' a ' + label(friday),
+        period,
         days: new Map(),
       });
     }
-    const { days } = weeks.get(weekKey);
+    const { days } = groups.get(groupKey);
     if (!days.has(record.date)) days.set(record.date, { title: record.dateLong, records: [] });
     days.get(record.date).records.push(record);
   }
-  return [...weeks.values()].map(week => ({ ...week, days: [...week.days.values()] }));
+  return [...groups.values()].map(group => ({ ...group, days: [...group.days.values()] }));
 }
 
 class Component extends DCLogic {
@@ -170,11 +174,11 @@ class Component extends DCLogic {
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,
       setPrintFormat: val(printFormat => this.setState({ printFormat })),
-      weeklyPrint: s.printFormat === 'weekly',
+      groupedPrint: s.printFormat === 'weekly' || s.printFormat === 'monthly',
       compactPrint: s.printFormat === 'compact',
       detailedPrint: s.printFormat === 'detailed',
       printOrientation: s.printFormat === 'compact' ? 'paisagem' : 'retrato',
-      printWeeks: s.printFormat === 'weekly' ? groupPrintWeeks(printRecs) : [],
+      printGroups: groupPrintRecords(printRecs, s.printFormat === 'monthly'),
       doPrint: () => window.print(),
 
       hasOpen: !!openRec, o: openRec ? deco(openRec) : {},

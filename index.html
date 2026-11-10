@@ -214,6 +214,7 @@ Selecionar todos ({{ filteredCount }})
 <span>Formato de impressão</span>
 <sc-raw-select value="{{ printFormat }}" sc-camel-on-change="{{ setPrintFormat }}">
 <option value="weekly">Semanal por turma</option>
+<option value="monthly">Mensal por turma</option>
 <option value="compact">Tabela compacta</option>
 <option value="detailed">Relatório detalhado</option>
 </sc-raw-select>
@@ -239,12 +240,12 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Disciplina</span><span style="font:600 15px var(--font-heading)">{{ pm.disciplina }}</span></div>
 <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Período</span><span style="font:600 15px var(--font-heading)">{{ pm.periodo }}</span></div>
 </div>
-<sc-if value="{{ weeklyPrint }}">
+<sc-if value="{{ groupedPrint }}">
 <div class="print-weeks">
-<sc-for list="{{ printWeeks }}" as="week">
+<sc-for list="{{ printGroups }}" as="group">
 <section>
-<h2 class="print-week-title">{{ week.turma }} · {{ week.period }}</h2>
-<sc-for list="{{ week.days }}" as="day">
+<h2 class="print-week-title">{{ group.turma }} · {{ group.period }}</h2>
+<sc-for list="{{ group.days }}" as="day">
 <h3 class="print-day-title">{{ day.title }}</h3>
 <sc-for list="{{ day.records }}" as="lesson">
 <div class="print-week-lesson">
