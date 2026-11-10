@@ -1,0 +1,19 @@
+:root{--color-bg:#eadfc6;--color-surface:#ddd0b0;--color-neutral-100:#f3ebd8;--color-neutral-200:#d6c8a5;--color-neutral-300:#c7b88f;--color-neutral-400:#bcb19a;--color-neutral-500:#9d937e;--color-neutral-600:#7f765f;--color-neutral-700:#615a4a;--color-neutral-800:#454036;--color-neutral-900:#2e2a23}
+html{background:#eadfc6}
+body{margin:0;background:var(--color-bg,#eadfc6);color:var(--color-text);font-family:var(--font-body);font-size:16px}
+a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}
+button,input,select,textarea{font-family:inherit}
+@keyframes splashIn{from{opacity:0}to{opacity:1}}
+@keyframes splashLogoIn{from{opacity:0;filter:blur(18px);transform:translate(-50%,-50%) scale(.7)}55%{opacity:1}to{opacity:1;filter:blur(0);transform:translate(-50%,-50%) scale(1)}}
+@keyframes glowIn{from{opacity:0;transform:translate(-50%,-50%) scale(.3)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes ringOut{0%{opacity:.55;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
+@keyframes titleIn{from{opacity:0;transform:translate(-50%,12px);letter-spacing:.5em}to{opacity:1;transform:translate(-50%,0);letter-spacing:.18em}}
+@keyframes riseIn{from{opacity:0;transform:translateY(22px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+@media (prefers-reduced-motion:reduce){.splash,.splash *,.rise{animation:none !important;transition:none !important}}
+@media print{
+body{background:#f4ecd9}
+[data-print-hide]{display:none !important}
+[data-print-wrap]{padding:0 !important;max-width:none !important}
+[data-print-page]{box-shadow:none !important;max-width:none !important;min-height:0 !important;padding:0 !important}
+@page{size:A4;margin:14mm}
+}
