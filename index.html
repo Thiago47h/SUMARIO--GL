@@ -54,6 +54,20 @@
 </header>
 </sc-if>
 
+<sc-if value="{{ isCoordHome }}">
+<main style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px)">
+<p style="margin:0;color:var(--color-neutral-700)">Coordenação e Direção</p>
+<h1 style="margin:6px 0 12px;font-size:clamp(32px,5vw,48px)">Painel da direção</h1>
+<p style="margin:0 0 22px">Acompanhe os planejamentos e as observações da coordenação.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--space-4);margin-bottom:20px">
+<div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordTotal }}</strong>Semanários salvos</div>
+<div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordClasses }}</strong>Turmas com semanários</div>
+<div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordNotes }}</strong>Semanários com observação</div>
+</div>
+<button class="welcome-action" sc-camel-on-click="{{ goList }}">Ver semanários →</button>
+</main>
+</sc-if>
+
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="02 Início" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-8)">
 <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px">
