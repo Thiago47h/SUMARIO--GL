@@ -57,7 +57,7 @@
 <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px">
 <span style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">{{ todayLabel }}</span>
 <h1 class="welcome-greeting" data-greet-on-entry="{{ greetOnEntry }}"><span>{{ greeting }}, {{ teacherFirst }}.</span></h1>
-<p style="margin:0;font-size:18px;color:var(--color-neutral-700);text-wrap:pretty">Você tem {{ totalCount }} semanários salvos. Registre a aula de hoje ou consulte os anteriores.</p>
+<p style="margin:0;font-size:18px;color:var(--color-neutral-700);text-wrap:pretty">Você tem {{ totalCount }} semanários salvos. Planeje as aulas da semana ou consulte seus semanários.</p>
 <button class="welcome-action" sc-camel-on-click="{{ goCreate }}">+ Criar semanário</button>
 </div>
 <section style="display:flex;flex-direction:column;gap:var(--space-4)">
@@ -115,13 +115,13 @@
 </div>
 <span style="font-size:14px;color:var(--color-accent-700)">{{ aulasPreview }}</span>
 </fieldset>
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Páginas trabalhadas <span style="color:var(--color-neutral-700)">(opcional)</span>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Páginas a serem trabalhadas <span style="color:var(--color-neutral-700)">(opcional)</span>
 <input type="text" value="{{ f.paginas }}" sc-camel-on-change="{{ setPaginas }}" placeholder="Ex.: 112 a 115" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
 </label>
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Conteúdo trabalhado *
-<textarea value="{{ f.conteudo }}" sc-camel-on-change="{{ setConteudo }}" rows="5" placeholder="O que foi trabalhado na aula?" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Conteúdo a ser trabalhado *
+<textarea value="{{ f.conteudo }}" sc-camel-on-change="{{ setConteudo }}" rows="5" placeholder="O que será trabalhado nas aulas?" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
-<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Tarefa de casa <span style="color:var(--color-neutral-700)">(opcional)</span>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Tarefa de casa prevista <span style="color:var(--color-neutral-700)">(opcional)</span>
 <textarea value="{{ f.tarefa }}" sc-camel-on-change="{{ setTarefa }}" rows="3" placeholder="Ex.: Exercícios 1 a 5, página 42" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Observações <span style="color:var(--color-neutral-700)">(opcional)</span>
@@ -231,7 +231,7 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-3)">
 <img src="assets/logo.png?v=2" alt="Colégio Gênesis Life" style="height:64px;width:auto">
 <div style="display:flex;flex-direction:column;align-items:flex-end;text-align:right">
-<span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Registro de conteúdo</span>
+<span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-700)">Planejamento de aulas</span>
 <span style="font:600 26px/1.1 var(--font-heading)">Semanário</span>
 </div>
 </div>
@@ -256,8 +256,8 @@ Selecionar todos ({{ filteredCount }})
 <div class="print-week-lesson">
 <strong>{{ lesson.aulasLabel }} · {{ lesson.disciplina }}</strong>
 <p>{{ lesson.conteudo }}</p>
-<sc-if value="{{ lesson.paginas }}"><p>Páginas trabalhadas — {{ lesson.paginas }}</p></sc-if>
-<sc-if value="{{ lesson.tarefa }}"><p>Tarefa de casa — {{ lesson.tarefa }}</p></sc-if>
+<sc-if value="{{ lesson.paginas }}"><p>Páginas a serem trabalhadas — {{ lesson.paginas }}</p></sc-if>
+<sc-if value="{{ lesson.tarefa }}"><p>Tarefa de casa prevista — {{ lesson.tarefa }}</p></sc-if>
 <sc-if value="{{ lesson.obs }}"><p>Observações — {{ lesson.obs }}</p></sc-if>
 </div>
 </sc-for>
@@ -268,13 +268,13 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 <sc-if value="{{ compactPrint }}">
 <div class="print-compact-scroll">
-<div class="print-compact-table" role="table" aria-label="Registros de aula">
+<div class="print-compact-table" role="table" aria-label="Planejamento de aulas">
 <div class="print-compact-row print-compact-header" role="row">
 <strong role="columnheader">Data</strong>
 <strong role="columnheader">Aula</strong>
 <strong role="columnheader">Turma</strong>
 <strong role="columnheader">Disciplina</strong>
-<strong role="columnheader">Conteúdo trabalhado</strong>
+<strong role="columnheader">Conteúdo a ser trabalhado</strong>
 </div>
 <sc-for list="{{ printRows }}" as="p">
 <div class="print-compact-row" role="row">
@@ -306,7 +306,7 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 <p style="margin:0;font-size:15px;line-height:1.55;text-wrap:pretty">{{ p.conteudo }}</p>
 <sc-if value="{{ p.tarefa }}" hint-placeholder-val="{{ false }}">
-<p style="margin:0;font-size:14px;line-height:1.5"><strong style="font-weight:600">Tarefa de casa:</strong> {{ p.tarefa }}</p>
+<p style="margin:0;font-size:14px;line-height:1.5"><strong style="font-weight:600">Tarefa de casa prevista:</strong> {{ p.tarefa }}</p>
 </sc-if>
 <sc-if value="{{ p.obs }}" hint-placeholder-val="{{ false }}">
 <p style="margin:0;font-size:14px;line-height:1.5;font-style:italic;color:var(--color-neutral-800)"><span style="font-style:normal;font-weight:600">Observações:</span> {{ p.obs }}</p>
@@ -332,12 +332,12 @@ Selecionar todos ({{ filteredCount }})
 <span style="font:600 26px/1.15 var(--font-heading)">{{ o.dateLong }}</span>
 <span style="align-self:flex-start;font-size:13px;padding:3px 10px;border-radius:var(--radius-sm);background:var(--color-accent-100);color:var(--color-accent-800)">{{ o.aulasLabel }}</span>
 </div>
-<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Conteúdo trabalhado</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.conteudo }}</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Conteúdo a ser trabalhado</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.conteudo }}</p></div>
 <sc-if value="{{ o.paginas }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Páginas trabalhadas</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.paginas }}</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Páginas a serem trabalhadas</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.paginas }}</p></div>
 </sc-if>
 <sc-if value="{{ o.tarefa }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Tarefa de casa</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.tarefa }}</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Tarefa de casa prevista</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.tarefa }}</p></div>
 </sc-if>
 <sc-if value="{{ o.obs }}" hint-placeholder-val="{{ false }}">
 <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Observações</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.obs }}</p></div>
