@@ -143,7 +143,7 @@ class Component extends DCLogic {
           this.setState({ loginError: 'Informe um e-mail válido e a senha.' });
           return;
         }
-        this.go('home', { rise: true });
+        this.go('home');
       },
       logout: () => this.go('login', { password: '', rise: false }),
       goHome: () => this.go('home'),

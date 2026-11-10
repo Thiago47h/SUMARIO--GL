@@ -115,12 +115,4 @@ body{background:#f4ecd9}
 }
 .welcome-greeting span {
   display: block;
-  animation: greetingDrop 850ms cubic-bezier(.2, .75, .25, 1) both;
-}
-@keyframes greetingDrop {
-  from { opacity: 0; transform: translateY(-72px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .welcome-greeting span { animation: none; }
 }
