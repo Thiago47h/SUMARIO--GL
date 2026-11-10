@@ -5,7 +5,7 @@
 <title>Semanário | Colégio Gênesis Life</title>
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/app.css?v=5">
+<link rel="stylesheet" href="css/app.css?v=6">
 <script defer src="js/bootstrap.js"></script>
 </head>
 <body>
@@ -240,6 +240,7 @@ Selecionar todos ({{ filteredCount }})
 <option value="weekly">Semanal por turma</option>
 <option value="monthly">Mensal por turma</option>
 <option value="compact">Tabela compacta</option>
+<option value="boxes">Em caixas</option>
 <option value="detailed">Relatório detalhado</option>
 </sc-raw-select>
 </label>
@@ -305,6 +306,22 @@ Selecionar todos ({{ filteredCount }})
 </div>
 </sc-for>
 </div>
+</div>
+</sc-if>
+<sc-if value="{{ boxesPrint }}">
+<div class="print-boxes">
+<sc-for list="{{ printRows }}" as="p">
+<section class="print-box">
+<h2>{{ p.turma }} · {{ p.disciplina }}</h2>
+<p>{{ p.dateShort }} · {{ p.aulasLabel }}</p>
+<div class="print-box-fields">
+<div><strong>Conteúdo a ser trabalhado</strong><p>{{ p.conteudo }}</p></div>
+<sc-if value="{{ p.paginas }}"><div><strong>Páginas a serem trabalhadas</strong><p>{{ p.paginas }}</p></div></sc-if>
+<sc-if value="{{ p.tarefa }}"><div><strong>Tarefa de casa prevista</strong><p>{{ p.tarefa }}</p></div></sc-if>
+<sc-if value="{{ p.obs }}"><div><strong>Observações</strong><p>{{ p.obs }}</p></div></sc-if>
+</div>
+</section>
+</sc-for>
 </div>
 </sc-if>
 <sc-if value="{{ detailedPrint }}">
