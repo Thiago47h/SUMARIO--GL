@@ -150,7 +150,7 @@ class Component extends DCLogic {
         }
         this.setState({ splash: 'center', rise: false });
         setTimeout(() => this.go('home', { splash: 'fly', rise: true }), 700);
-        setTimeout(() => this.setState({ splash: '', rise: false }), 1500);
+        setTimeout(() => this.setState({ splash: '', rise: false }), 1850);
       },
       logout: () => this.go('login', { password: '' }),
       goHome: () => this.go('home'),
