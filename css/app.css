@@ -113,12 +113,12 @@ body{background:#f4ecd9}
   overflow: visible;
   font-size: clamp(34px, 6vw, 52px);
 }
-.welcome-greeting span {
+.welcome-greeting > span {
   display: block;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .welcome-greeting[data-greet-on-entry="yes"] span {
+  .welcome-greeting[data-greet-on-entry="yes"] > span {
     animation: greetingDrop 740ms cubic-bezier(.2, .75, .25, 1) 520ms both;
   }
 }
