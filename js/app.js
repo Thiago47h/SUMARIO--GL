@@ -67,7 +67,7 @@ class Component extends DCLogic {
   state = (() => {
     let records = SEED;
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (Array.isArray(s) && s.length) records = s; } catch (e) {}
-    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
+    return { screen: 'login', coordinator: false, email: 'ana.moura@example.com', password: 'senha123', loginError: '', records, f: blank(), editingId: null, formError: '', flt: { professor: '', turma: '', disciplina: '', from: '', to: '' }, selected: [], printIds: [], printFormat: 'weekly', openId: null, toast: '', splash: '', rise: false };
   })();
 
   persist(records) { try { localStorage.setItem(KEY, JSON.stringify(records)); } catch (e) {} }
@@ -88,7 +88,7 @@ class Component extends DCLogic {
     }
     let next;
     if (editingId) next = records.map(r => r.id === editingId ? { ...r, ...f } : r);
-    else next = [{ id: Date.now(), ...f }, ...records];
+    else next = [{ id: Date.now(), professor: TEACHER, ...f }, ...records];
     this.persist(next);
     const label = periodLabel(f.date, f.endDate) + ' · ' + f.turma;
     if (another) {
@@ -118,8 +118,8 @@ class Component extends DCLogic {
   }
 
   filtered() {
-    const { records, flt } = this.state;
-    return records.filter(r => (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
+    const { records, flt, coordinator } = this.state;
+    return records.filter(r => (!coordinator || !flt.professor || (r.professor || TEACHER) === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
   }
 
   renderVals() {
@@ -145,7 +145,7 @@ class Component extends DCLogic {
     };
     const openRec = s.openId ? s.records.find(r => r.id === s.openId) : null;
     const td = dp(TODAY);
-    const hasFilters = !!(s.flt.turma || s.flt.disciplina || s.flt.from || s.flt.to);
+    const hasFilters = !!((s.coordinator && s.flt.professor) || s.flt.turma || s.flt.disciplina || s.flt.from || s.flt.to);
     const setFlt = k => val(v => this.setState(st => ({ flt: { ...st.flt, [k]: v } })));
     const nSel = s.selected.length;
     const vw = (typeof window !== 'undefined' && window.innerWidth) || 1280;
@@ -230,8 +230,9 @@ class Component extends DCLogic {
       onSaveAnother: () => this.save(true),
       onCancel: () => this.go(s.editingId ? 'list' : 'home', { editingId: null, f: blank(), formError: '' }),
 
-      flt: s.flt, fTurma: setFlt('turma'), fDisc: setFlt('disciplina'), fFrom: setFlt('from'), fTo: setFlt('to'),
-      hasFilters, clearFilters: () => this.setState({ flt: { turma: '', disciplina: '', from: '', to: '' } }),
+      professores: [...new Set(s.records.map(r => r.professor || TEACHER))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+      flt: s.flt, fProfessor: setFlt('professor'), fTurma: setFlt('turma'), fDisc: setFlt('disciplina'), fFrom: setFlt('from'), fTo: setFlt('to'),
+      hasFilters, clearFilters: () => this.setState({ flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } }),
       filteredCount: filtered.length, noRows: filtered.length === 0,
       allBox: box(allOn),
       toggleAll: () => this.setState(st => { const ids = filtered.map(r => r.id); return { selected: allOn ? st.selected.filter(id => !ids.includes(id)) : [...new Set([...st.selected, ...ids])] }; }),
