@@ -118,11 +118,14 @@ body{background:#f4ecd9}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .welcome-greeting[data-greet-on-entry="yes"] > span {
-    animation: greetingDrop 740ms cubic-bezier(.2, .75, .25, 1) 520ms both;
+  main[data-screen-label="02 Início"]:has([data-greet-on-entry="yes"]) {
+    animation: dashboardDrop 740ms cubic-bezier(.2, .75, .25, 1) 520ms both;
+  }
+  main[data-screen-label="02 Início"]:has([data-greet-on-entry="yes"]) .rise {
+    animation: none !important;
   }
 }
-@keyframes greetingDrop {
-  from { opacity: 0; transform: translateY(-62px); }
+@keyframes dashboardDrop {
+  from { opacity: 0; transform: translateY(-48px); }
   to { opacity: 1; transform: translateY(0); }
 }
