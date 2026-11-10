@@ -147,7 +147,7 @@
 <main data-screen-label="04 Ver semanários" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-6)">
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
 <h1 style="margin:0;font-size:clamp(32px,5vw,42px)">{{ listTitle }}</h1>
-<p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Filtre, abra ou edite. Marque os registros que deseja imprimir.</p>
+<p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Filtre, abra ou edite. Marque os registros que deseja visualizar.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:var(--space-3);align-items:end">
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma
@@ -178,13 +178,13 @@ Selecionar todos ({{ filteredCount }})
 <button sc-camel-on-click="{{ clearFilters }}" style="background:none;border:none;padding:4px;color:var(--color-accent-700);font:inherit;font-size:15px;cursor:pointer" style-hover="text-decoration:underline">Limpar filtros</button>
 </sc-if>
 <span style="margin-left:auto;font-size:15px;color:var(--color-neutral-700)">{{ selectedLabel }}</span>
-<button sc-camel-on-click="{{ goPrint }}" disabled="{{ noSelection }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer;opacity:{{ printOpacity }}" style-hover="background:var(--color-accent-600)">Prévia de impressão</button>
+<button sc-camel-on-click="{{ goPrint }}" disabled="{{ noSelection }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer;opacity:{{ printOpacity }}" style-hover="background:var(--color-accent-600)"><sc-if value="{{ isTeacher }}">Visualizar</sc-if><sc-if value="{{ isCoordinator }}">Prévia de impressão</sc-if></button>
 </div>
 <div style="display:flex;flex-direction:column;gap:var(--space-2)">
 <sc-if value="{{ isCoordinator }}"><p style="margin:0">Professora de demonstração · {{ teacherName }}</p></sc-if>
 <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:{{ r.rowBg }};box-shadow:{{ r.rowRing }}">
-<button sc-camel-on-click="{{ r.toggle }}" aria-label="Selecionar para impressão" style="width:44px;height:44px;margin:-10px 0 0 -10px;flex:none;display:grid;place-items:center;background:none;border:none;cursor:pointer;padding:0">
+<button sc-camel-on-click="{{ r.toggle }}" aria-label="Selecionar semanário" style="width:44px;height:44px;margin:-10px 0 0 -10px;flex:none;display:grid;place-items:center;background:none;border:none;cursor:pointer;padding:0">
 <span style="width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-md);border:1.5px solid {{ r.boxBorder }};background:{{ r.boxBg }};color:var(--color-bg);font-size:14px;line-height:1">{{ r.mark }}</span>
 </button>
 <div style="width:142px;max-width:100%;flex:none;display:flex;flex-direction:column;gap:2px">
@@ -235,7 +235,7 @@ Selecionar todos ({{ filteredCount }})
 <div data-print-hide="true" style="max-width:794px;width:100%;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-4)">
 <button sc-camel-on-click="{{ goList }}" style="min-height:44px;background:none;border:none;padding:0;color:var(--color-accent-700);font:600 15px var(--font-heading);cursor:pointer">← Voltar aos semanários</button>
 <label class="print-format-label">
-<span>Formato de impressão</span>
+<span>Formato de visualização</span>
 <sc-raw-select value="{{ printFormat }}" sc-camel-on-change="{{ setPrintFormat }}">
 <option value="weekly">Semanal por turma</option>
 <option value="monthly">Mensal por turma</option>
@@ -244,7 +244,9 @@ Selecionar todos ({{ filteredCount }})
 </sc-raw-select>
 </label>
 <span style="margin-left:auto;font-size:14px;color:var(--color-neutral-700)">A4 {{ printOrientation }} · {{ printCount }} registros</span>
+<sc-if value="{{ isCoordinator }}">
 <button sc-camel-on-click="{{ doPrint }}" style="min-height:48px;padding:0 var(--space-6);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 16px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Imprimir / Salvar em PDF</button>
+</sc-if>
 </div>
 <article data-print-page="true" data-print-format="{{ printFormat }}" style="width:100%;max-width:794px;min-height:1123px;margin:0 auto;padding:clamp(24px,7vw,64px) clamp(20px,7vw,68px);background:#f4ecd9;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:var(--space-6)">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-3)">
@@ -362,7 +364,7 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)">
 <button sc-camel-on-click="{{ closeOpen }}" style="min-height:44px;padding:0 var(--space-3);border:none;background:none;font:400 15px var(--font-body);color:var(--color-neutral-700);cursor:pointer">Fechar</button>
-<button sc-camel-on-click="{{ printOpen }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 15px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Imprimir</button>
+<button sc-camel-on-click="{{ printOpen }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 15px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)"><sc-if value="{{ isTeacher }}">Visualizar</sc-if><sc-if value="{{ isCoordinator }}">Imprimir</sc-if></button>
 <sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ editOpen }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Editar</button>
 </sc-if>
