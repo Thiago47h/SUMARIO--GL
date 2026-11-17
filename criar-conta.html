@@ -4,14 +4,16 @@
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#eadfc6;color:#2e2a23;font:16px/1.5 system-ui,sans-serif}
 main{width:100%;max-width:430px}img{width:200px;height:auto}h1{font-size:30px}form,label{display:grid;gap:8px}form{gap:18px}input,button{min-height:48px;border-radius:6px;padding:10px 12px;font:inherit}input{border:1px solid #9d937e;background:#fff}button{border:0;background:#0089a8;color:#fff;font-weight:600;cursor:pointer}button:disabled{opacity:.6;cursor:wait}a{color:#00677f}#message{white-space:pre-wrap} [hidden]{display:none!important}
-</style><script defer src="js/teacher-signup.js"></script></head><body><main>
+</style><script defer src="js/teacher-signup.js"></script><script defer src="js/password-visibility.js"></script>
+</head><body><main>
 <img src="assets/logo.png?v=2" alt="Colégio Gênesis Life">
 <h1>Criar conta de professor</h1><p>Preencha seus dados para preparar os semanários e acompanhar as orientações da coordenação.</p>
 <p id="message" role="status" aria-live="polite"></p>
 <form id="signup-form">
 <label>Nome completo<input name="name" type="text" autocomplete="name" minlength="2" maxlength="120" required></label>
 <label>E-mail<input name="email" type="email" autocomplete="email" required></label>
-<label>Senha<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
-<label>Confirmar senha<input name="confirmation" type="password" autocomplete="new-password" minlength="8" required></label>
+<label>Senha<input name="password" type="password" data-password-field="true" autocomplete="new-password" minlength="8" required></label>
+<label>Confirmar senha<input name="confirmation" type="password" data-password-field="true" autocomplete="new-password" minlength="8" required></label>
 <small>Use pelo menos 8 caracteres. Esta página cria contas com perfil Professor.</small>
+<label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer"><input type="checkbox" data-password-toggle="true" style="width:18px;height:18px;margin:0;min-height:0">Mostrar senha</label>
 <button>Criar conta de professor</button></form><p><a href="/">Voltar ao login</a></p></main></body></html>
