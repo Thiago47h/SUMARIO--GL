@@ -25,7 +25,7 @@ const semanarioBackend = (() => {
   async function records() {
     const all = [];
     for (let offset = 0; ; offset += 500) {
-      const page = await request('/rest/v1/semanario_plans?select=*,semanario_notes(note)&order=id&limit=500&offset=' + offset);
+      const page = await request('/rest/v1/semanario_plans?select=*,semanario_notes(note)&deleted_at=is.null&order=id&limit=500&offset=' + offset);
       all.push(...page.map(fromPlan));
       if (page.length < 500) return all;
     }
@@ -65,6 +65,14 @@ const semanarioBackend = (() => {
       });
       if (!row) throw new Error('Semanário indisponível.');
       return fromPlan(row);
+    },
+    async remove(id) {
+      const [record] = await request('/rest/v1/semanario_plans?id=eq.' + encodeURIComponent(id), {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ deleted_at: new Date().toISOString() }),
+      });
+      if (!record) throw new Error('Semanário indisponível.');
     },
     async saveNote(id, note) {
       const path = '/rest/v1/semanario_notes?plan_id=eq.' + encodeURIComponent(id);
