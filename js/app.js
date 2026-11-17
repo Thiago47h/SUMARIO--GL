@@ -17,6 +17,17 @@ const TURMAS_CADASTRADAS = [
   '6ºD - TARDE/2026',
   '7ºA - MANHÃ/2026',
   '7ºB - TARDE/2026',
+  '7ºC - TARDE/2026',
+  '7ºD - MANHÃ/2026',
+  '7ºE - TARDE/2026',
+  '8ºA - MANHÃ/2026',
+  '8ºB - TARDE/2026',
+  '8ºC - TARDE/2026',
+  '8ºD - MANHÃ/2026',
+  '8ºE - MANHÃ/2026',
+  '9ºA - MANHÃ/2026',
+  '9ºB - TARDE/2026',
+  '9ºC - MANHÃ/2026',
 ];
 const TODAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const WD = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
