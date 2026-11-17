@@ -53,7 +53,7 @@
     message.textContent = 'Enviando solicitação…';
     try {
       const email = new FormData(requestForm).get('email').trim();
-      await call('/recover?redirect_to=' + encodeURIComponent(location.origin + '/redefinir-senha.html'), 'POST', { email });
+      await call('/recover', 'POST', { email });
       message.textContent = 'Se houver uma conta para esse e-mail, o link será enviado. Confira também o spam.';
     } catch (error) {
       message.textContent = error.status === 429 ? 'Aguarde alguns minutos antes de solicitar outro link.' : 'Não foi possível enviar o link. Tente novamente ou fale com a secretaria.';
