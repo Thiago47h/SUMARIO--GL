@@ -6,7 +6,7 @@
 <title>Semanário | Colégio Gênesis Life</title>
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/app.css?v=6">
+<link rel="stylesheet" href="css/app.css?v=review-style2">
 <script defer src="js/backend.js?v=review1"></script>
 <script defer src="js/bootstrap.js?v=review1"></script>
 <style>
@@ -282,7 +282,7 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-direction:column;gap:var(--space-2)">
 
 <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
-<div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-3) var(--space-4);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:{{ r.rowBg }};box-shadow:{{ r.rowRing }}">
+<div class="semanario-card" style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--space-3) var(--space-4);padding:20px;border-radius:10px;background:{{ r.rowBg }};box-shadow:{{ r.rowRing }}">
 <button sc-camel-on-click="{{ r.toggle }}" aria-label="Selecionar semanário" style="width:44px;height:44px;margin:-10px 0 0 -10px;flex:none;display:grid;place-items:center;background:none;border:none;cursor:pointer;padding:0">
 <span style="width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-md);border:1.5px solid {{ r.boxBorder }};background:{{ r.boxBg }};color:var(--color-bg);font-size:14px;line-height:1">{{ r.mark }}</span>
 </button>
@@ -300,24 +300,34 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 </div>
 <span style="font-size:15px;line-height:1.5;color:var(--color-neutral-800);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ r.conteudo }}</span>
-<div style="display:grid;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--color-divider)">
-<strong style="font-size:14px">Situação: {{ r.statusLabel }}</strong><strong style="font-size:14px">Observação da coordenação</strong>
+<section class="plan-review" aria-label="Revisão da coordenação" data-review-status="{{ r.reviewStatus }}">
+<div class="plan-review-heading">
+<span class="plan-review-label">Revisão da coordenação</span>
+<span class="review-badge" aria-label="Situação do semanário">
+<span class="review-badge-dot" aria-hidden="true"></span>{{ r.statusLabel }}
+</span>
+</div>
 <sc-if value="{{ isTeacher }}">
 <sc-if value="{{ r.coordObservation }}">
-<p style="margin:0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere">{{ r.coordObservation }}</p>
+<div class="coord-message">
+<strong class="coord-message-title">Observação da coordenação</strong>
+<p class="coord-message-text">{{ r.coordObservation }}</p>
+</div>
 </sc-if>
 </sc-if>
 <sc-if value="{{ isCoordinator }}">
-<form sc-camel-on-submit="{{ r.review }}" style="display:grid;gap:6px">
-<textarea name="note" aria-label="Observação da coordenação" sc-camel-default-value="{{ r.coordObservation }}" rows="2" style="width:100%;resize:vertical;font:inherit"></textarea>
-<span style="font-size:13px">Para solicitar ajustes, descreva acima o que precisa ser alterado.</span>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button type="submit" name="decision" value="aprovado" style="min-height:40px;padding:8px 14px;cursor:pointer">Aprovar</button>
-<button type="submit" name="decision" value="ajustes" style="min-height:40px;padding:8px 14px;cursor:pointer">Solicitar ajustes</button>
+<form sc-camel-on-submit="{{ r.review }}" class="coord-review-form">
+<label class="coord-message-title">Observação da coordenação
+<textarea name="note" aria-label="Observação da coordenação" sc-camel-default-value="{{ r.coordObservation }}" rows="3"></textarea>
+</label>
+<span class="coord-review-help">Ao solicitar ajustes, descreva o que o professor precisa alterar.</span>
+<div class="coord-review-actions">
+<button class="review-approve" type="submit" name="decision" value="aprovado">✓ Aprovar</button>
+<button class="review-adjust" type="submit" name="decision" value="ajustes">Solicitar ajustes</button>
 </div>
 </form>
 </sc-if>
-</div>
+</section>
 </div>
 <div style="display:flex;gap:var(--space-1);margin-left:auto">
 <button sc-camel-on-click="{{ r.open }}" style="min-height:40px;padding:0 var(--space-3);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Abrir</button>
