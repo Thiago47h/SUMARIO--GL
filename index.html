@@ -160,7 +160,10 @@
 </sc-raw-select>
 </label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Disciplina *
-<input type="text" value="{{ f.disciplina }}" sc-camel-on-change="{{ setDisciplina }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" placeholder="Ex.: Matemática">
+<sc-raw-select value="{{ f.disciplina }}" sc-camel-on-change="{{ setDisciplina }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
+<option value="">Selecione a disciplina</option>
+<sc-for list="{{ disciplinasCadastro }}" as="disciplina"><option value="{{ disciplina }}">{{ disciplina }}</option></sc-for>
+</sc-raw-select>
 </label>
 </div>
 <fieldset style="border:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-2)">
