@@ -175,6 +175,9 @@
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Conteúdo a ser trabalhado *
 <textarea value="{{ f.conteudo }}" sc-camel-on-change="{{ setConteudo }}" rows="5" placeholder="O que será trabalhado nas aulas?" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Recursos e estratégias <span style="color:var(--color-neutral-700)">(opcional)</span>
+<textarea value="{{ f.recursos }}" sc-camel-on-change="{{ setRecursos }}" rows="3" placeholder="Ex.: Vídeos, slides, materiais concretos, atividades em grupo e estratégias para desenvolver as aulas." style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
+</label>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Tarefa de casa prevista <span style="color:var(--color-neutral-700)">(opcional)</span>
 <textarea value="{{ f.tarefa }}" sc-camel-on-change="{{ setTarefa }}" rows="3" placeholder="Ex.: Exercícios 1 a 5, página 42" style="padding:10px 12px;font:inherit;font-size:16px;line-height:1.5;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);resize:vertical" style-focus="border-color:var(--color-accent);outline:none"></textarea>
 </label>
@@ -337,6 +340,7 @@ Selecionar todos ({{ filteredCount }})
 <div class="print-week-lesson">
 <strong>{{ lesson.aulasLabel }} · {{ lesson.disciplina }}</strong>
 <p>{{ lesson.conteudo }}</p>
+<sc-if value="{{ lesson.recursos }}"><p style="white-space:pre-wrap"><strong>Recursos e estratégias</strong> — {{ lesson.recursos }}</p></sc-if>
 <sc-if value="{{ lesson.paginas }}"><p>Páginas a serem trabalhadas — {{ lesson.paginas }}</p></sc-if>
 <sc-if value="{{ lesson.tarefa }}"><p>Tarefa de casa prevista — {{ lesson.tarefa }}</p></sc-if>
 <sc-if value="{{ lesson.obs }}"><p>Observações / Ocorrências — {{ lesson.obs }}</p></sc-if>
@@ -363,7 +367,7 @@ Selecionar todos ({{ filteredCount }})
 <span role="cell">{{ p.aulasLabel }}</span>
 <span role="cell">{{ p.turma }}</span>
 <span role="cell">{{ p.disciplina }}</span>
-<span role="cell">{{ p.conteudo }}</span>
+<span role="cell">{{ p.conteudo }}<sc-if value="{{ p.recursos }}"><p style="margin:4px 0;white-space:pre-wrap"><strong>Recursos e estratégias</strong> — {{ p.recursos }}</p></sc-if></span>
 </div>
 </sc-for>
 </div>
@@ -377,6 +381,7 @@ Selecionar todos ({{ filteredCount }})
 <p>{{ p.dateShort }} · {{ p.aulasLabel }}</p>
 <div class="print-box-fields">
 <div><strong>Conteúdo a ser trabalhado</strong><p>{{ p.conteudo }}</p></div>
+<sc-if value="{{ p.recursos }}"><div><strong>Recursos e estratégias</strong><p style="white-space:pre-wrap">{{ p.recursos }}</p></div></sc-if>
 <sc-if value="{{ p.paginas }}"><div><strong>Páginas a serem trabalhadas</strong><p>{{ p.paginas }}</p></div></sc-if>
 <sc-if value="{{ p.tarefa }}"><div><strong>Tarefa de casa prevista</strong><p>{{ p.tarefa }}</p></div></sc-if>
 <sc-if value="{{ p.obs }}"><div><strong>Observações / Ocorrências</strong><p>{{ p.obs }}</p></div></sc-if>
@@ -402,6 +407,7 @@ Selecionar todos ({{ filteredCount }})
 <span style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-700)">{{ p.turma }} · {{ p.disciplina }}</span>
 </sc-if>
 <p style="margin:0;font-size:15px;line-height:1.55;text-wrap:pretty">{{ p.conteudo }}</p>
+<sc-if value="{{ p.recursos }}"><p style="margin:0;white-space:pre-wrap"><strong>Recursos e estratégias</strong> — {{ p.recursos }}</p></sc-if>
 <sc-if value="{{ p.tarefa }}" hint-placeholder-val="{{ false }}">
 <p style="margin:0;font-size:14px;line-height:1.5"><strong style="font-weight:600">Tarefa de casa prevista:</strong> {{ p.tarefa }}</p>
 </sc-if>
@@ -429,6 +435,7 @@ Selecionar todos ({{ filteredCount }})
 <span style="align-self:flex-start;font-size:13px;padding:3px 10px;border-radius:var(--radius-sm);background:var(--color-accent-100);color:var(--color-accent-800)">{{ o.aulasLabel }}</span>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Conteúdo a ser trabalhado</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.conteudo }}</p></div>
+<sc-if value="{{ o.recursos }}"><div><strong>Recursos e estratégias</strong><p style="white-space:pre-wrap">{{ o.recursos }}</p></div></sc-if>
 <sc-if value="{{ o.paginas }}" hint-placeholder-val="{{ false }}">
 <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Páginas a serem trabalhadas</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.paginas }}</p></div>
 </sc-if>
