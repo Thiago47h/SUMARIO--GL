@@ -18,7 +18,7 @@ const weekEnd = iso => {
 };
 const periodLabel = (start, end) => end && end !== start ? fmt(start) + ' a ' + fmt(end) : fmt(start);
 const aulasLabel = a => { const s = [...a].sort((x, y) => x - y).map(n => n + 'ª'); if (!s.length) return ''; if (s.length === 1) return s[0] + ' aula'; return s.slice(0, -1).join(', ') + ' e ' + s[s.length - 1] + ' aulas'; };
-const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', conteudo: '', tarefa: '', obs: '' });
+const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', recursos: '', conteudo: '', tarefa: '', obs: '' });
 const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: periodLabel(r.date, r.endDate), dateLong: r.endDate && r.endDate !== r.date ? periodLabel(r.date, r.endDate) : WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
@@ -101,7 +101,7 @@ class Component extends DCLogic {
   edit(id) {
     const r = this.state.records.find(x => x.id === id);
     if (!r) return;
-    this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, tarefa: r.tarefa, obs: r.obs }, formError: '' });
+    this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, recursos: r.recursos || '', tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
   async saveCoord(id, event) {
@@ -236,7 +236,7 @@ class Component extends DCLogic {
       notEditing: !s.editingId, formError: s.formError,
       setWeek: val(v => this.setF('date', v)),
       setWeekEnd: val(v => this.setF('endDate', v)), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
-      setPaginas: val(v => this.setF('paginas', v)), setConteudo: val(v => this.setF('conteudo', v)), setTarefa: val(v => this.setF('tarefa', v)), setObs: val(v => this.setF('obs', v)),
+      setPaginas: val(v => this.setF('paginas', v)), setConteudo: val(v => this.setF('conteudo', v)), setRecursos: val(v => this.setF('recursos', v)), setTarefa: val(v => this.setF('tarefa', v)), setObs: val(v => this.setF('obs', v)),
       aulaChips: [1, 2, 3, 4, 5, 6].map(n => { const on = s.f.aulas.includes(n); return { label: n + 'ª aula', on, border: on ? 'var(--color-accent)' : 'var(--color-divider)', bg: on ? 'var(--color-accent)' : 'var(--color-surface)', fg: on ? 'var(--color-bg)' : 'var(--color-text)', toggle: () => this.setF('aulas', on ? s.f.aulas.filter(x => x !== n) : [...s.f.aulas, n]) }; }),
       aulasPreview: s.f.aulas.length ? 'Selecionado: ' + aulasLabel(s.f.aulas) : '',
       onSave: e => { e.preventDefault(); this.save(false); },
