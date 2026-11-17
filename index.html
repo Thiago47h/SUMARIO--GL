@@ -455,7 +455,7 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)">
 <button sc-camel-on-click="{{ closeOpen }}" style="min-height:44px;padding:0 var(--space-3);border:none;background:none;font:400 15px var(--font-body);color:var(--color-neutral-700);cursor:pointer">Fechar</button>
-<button sc-camel-on-click="{{ printOpen }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 15px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)"><sc-if value="{{ isTeacher }}">Visualizar</sc-if><sc-if value="{{ isCoordinator }}">Imprimir</sc-if></button>
+<button sc-camel-on-click="{{ printOpen }}" style="min-height:44px;padding:0 var(--space-4);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 15px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Visualizar</button>
 <sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ editOpen }}" style="min-height:44px;padding:0 var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 15px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Editar</button>
 </sc-if>
