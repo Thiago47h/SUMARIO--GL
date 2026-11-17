@@ -153,6 +153,28 @@ class Component extends DCLogic {
     this.flash('Observação da coordenação atualizada.');
   }
 
+  async remove(id) {
+    if (this.state.coordinator || this._writing) return;
+    const record = this.state.records.find(item => item.id === id);
+    if (!record || !window.confirm('Excluir o semanário de ' + record.turma + ' (' + periodLabel(record.date, record.endDate) + ')?')) return;
+    this._writing = true;
+    try {
+      await semanarioBackend.remove(id);
+      if (this.state.screen === 'login') return;
+      this.setState(state => ({
+        records: state.records.filter(item => item.id !== id),
+        selected: state.selected.filter(item => item !== id),
+        printIds: state.printIds.filter(item => item !== id),
+        openId: state.openId === id ? null : state.openId,
+      }));
+      this.flash('Semanário excluído.');
+    } catch {
+      this.flash('Não foi possível excluir. Confira a conexão ou entre novamente.');
+    } finally {
+      this._writing = false;
+    }
+  }
+
   filtered() {
     const { records, flt, coordinator } = this.state;
     return records.filter(r => (!coordinator || !flt.professor || r.professor === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
@@ -283,7 +305,7 @@ class Component extends DCLogic {
       selectedLabel: nSel ? nSel + (nSel === 1 ? ' selecionado' : ' selecionados') : 'Nenhum selecionado',
       noSelection: nSel === 0, printOpacity: nSel ? 1 : 0.45,
       goPrint: () => { if (nSel) this.go('print', { printFormat: 'boxes', printIds: [...s.selected] }); },
-      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoord: e => this.saveCoord(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id) }; }),
+      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoord: e => this.saveCoord(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id), remove: () => this.remove(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,
