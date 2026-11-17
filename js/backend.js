@@ -38,7 +38,16 @@ const semanarioBackend = (() => {
       });
       token = session.access_token;
       try {
-        const [profile] = await request('/rest/v1/semanario_profiles?select=name,role');
+        let [profile] = await request('/rest/v1/semanario_profiles?select=name,role');
+        const details = session.user.user_metadata || {};
+        if (!profile && details.signup_source === 'semanario') {
+          const name = String(details.name || '').trim();
+          await request('/rest/v1/semanario_profiles', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: session.user.id, name, role: 'teacher' }),
+          });
+          [profile] = await request('/rest/v1/semanario_profiles?select=name,role');
+        }
         if (!profile) throw new Error('Perfil não cadastrado.');
         return { profile, records: await records() };
       } catch (error) {
