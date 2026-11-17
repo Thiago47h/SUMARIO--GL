@@ -19,19 +19,20 @@ const semanarioBackend = (() => {
   }
 
   function fromPlan({ start_date, end_date, semanario_notes, ...row }) {
-    return { ...row, date: start_date, endDate: end_date, coordObservation: semanario_notes?.note || '' };
+    return { ...row, date: start_date, endDate: end_date, coordObservation: semanario_notes?.note || '', reviewStatus: semanario_notes?.reviewed_revision === row.revision ? semanario_notes.review_status : 'enviado', reviewedAt: semanario_notes?.reviewed_at || null };
   }
 
   async function records() {
     const all = [];
     for (let offset = 0; ; offset += 500) {
-      const page = await request('/rest/v1/semanario_plans?select=*,semanario_notes(note)&deleted_at=is.null&order=id&limit=500&offset=' + offset);
+      const page = await request('/rest/v1/semanario_plans?select=*,semanario_notes(note,review_status,reviewed_revision,reviewed_at)&deleted_at=is.null&order=id&limit=500&offset=' + offset);
       all.push(...page.map(fromPlan));
       if (page.length < 500) return all;
     }
   }
 
   return {
+    records,
     async login(email, password) {
       const session = await request('/auth/v1/token?grant_type=password', {
         method: 'POST', body: JSON.stringify({ email, password }),
@@ -74,15 +75,20 @@ const semanarioBackend = (() => {
       });
       if (!record) throw new Error('Semanário indisponível.');
     },
-    async saveNote(id, note) {
-      const path = '/rest/v1/semanario_notes?plan_id=eq.' + encodeURIComponent(id);
-      const [updated] = await request(path, {
-        method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ note }),
-      });
-      if (updated) return;
-      await request('/rest/v1/semanario_notes', {
-        method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ plan_id: id, note }),
-      });
+    async review(record, status, note) {
+      if (!['aprovado','ajustes'].includes(status) || (status === 'ajustes' && !note.trim())) throw new Error('Revisão inválida.');
+      const body = { note, review_status: status, reviewed_revision: record.revision };
+      const path = '/rest/v1/semanario_notes?plan_id=eq.' + encodeURIComponent(record.id);
+      const update = () => request(path, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(body) });
+      const updated = await update();
+      if (!updated.length) {
+        try {
+          await request('/rest/v1/semanario_notes', { method: 'POST', body: JSON.stringify({ plan_id: record.id, ...body }) });
+        } catch (error) {
+          if (!(await update()).length) throw error;
+        }
+      }
+      return records();
     },
   };
 })();

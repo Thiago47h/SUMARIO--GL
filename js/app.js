@@ -1,3 +1,4 @@
+const REVIEW_LABELS = { enviado: 'Enviado', ajustes: 'Ajustes', aprovado: 'Aprovado' };
 const DISCIPLINAS_CADASTRADAS = [
   'Ciência e Tecnologia',
   'Ciências',
@@ -50,7 +51,7 @@ const weekEnd = iso => {
 const periodLabel = (start, end) => end && end !== start ? fmt(start) + ' a ' + fmt(end) : fmt(start);
 const aulasLabel = a => { const s = [...a].sort((x, y) => x - y).map(n => n + 'ª'); if (!s.length) return ''; if (s.length === 1) return s[0] + ' aula'; return s.slice(0, -1).join(', ') + ' e ' + s[s.length - 1] + ' aulas'; };
 const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', recursos: '', conteudo: '', tarefa: '', obs: '' });
-const deco = r => { const d = dp(r.date); return { ...r, dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: periodLabel(r.date, r.endDate), dateLong: r.endDate && r.endDate !== r.date ? periodLabel(r.date, r.endDate) : WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
+const deco = r => { const d = dp(r.date); return { ...r, statusLabel: REVIEW_LABELS[r.reviewStatus] || 'Enviado', dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: periodLabel(r.date, r.endDate), dateLong: r.endDate && r.endDate !== r.date ? periodLabel(r.date, r.endDate) : WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
 function groupPrintRecords(records, monthly) {
@@ -85,7 +86,7 @@ class Component extends DCLogic {
     screen: 'login', coordinator: false, email: '', password: '', loginError: '',
     records: [], name: '', f: blank(), editingId: null, formError: '',
     flt: { professor: '', turma: '', disciplina: '', from: '', to: '' },
-    selected: [], printIds: [], printFormat: 'boxes', openId: null, toast: '', splash: '', rise: false,
+    reviewFilter: '', selected: [], printIds: [], printFormat: 'boxes', openId: null, toast: '', splash: '', rise: false,
   };
 
   go(screen, extra) { this.setState({ screen, openId: null, ...(extra || {}) }); window.scrollTo(0, 0); }
@@ -125,7 +126,7 @@ class Component extends DCLogic {
       this.flash('Semanário salvo (' + label + '). Preencha o próximo.');
     } else {
       this.go('list', { records: next, editingId: null, f: blank() });
-      this.flash(editingId ? 'Alterações salvas.' : 'Semanário salvo: ' + label);
+      this.flash(editingId ? 'Alterações enviadas para revisão.' : 'Semanário enviado: ' + label);
     }
   }
 
@@ -135,22 +136,53 @@ class Component extends DCLogic {
     this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, recursos: r.recursos || '', tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
-  async saveCoord(id, event) {
+  async review(id, event) {
     event.preventDefault();
     if (!this.state.coordinator || this._writing) return;
-    const coordObservation = String(new FormData(event.currentTarget).get('note') || '').trim();
+    const status = (event.nativeEvent?.submitter || event.submitter)?.value;
+    const note = String(new FormData(event.currentTarget).get('note') || '').trim();
+    const record = this.state.records.find(r => r.id === id);
+    if (!record || !['aprovado','ajustes'].includes(status)) return;
+    if (status === 'ajustes' && !note) { this.flash('Escreva os ajustes que o professor precisa fazer.'); return; }
+    const generation = this._generation;
     this._writing = true;
     try {
-      await semanarioBackend.saveNote(id, coordObservation);
-      if (this.state.screen === 'login') return;
-      this.setState(state => ({ records: state.records.map(record => record.id === id ? { ...record, coordObservation } : record) }));
-    } catch {
-      this.flash('Não foi possível salvar a observação. Confira a conexão ou entre novamente.');
-      return;
-    } finally {
-      this._writing = false;
-    }
-    this.flash('Observação da coordenação atualizada.');
+      const records = await semanarioBackend.review(record, status, note);
+      if (this._generation !== generation || this.state.screen === 'login') return;
+      this.setState({ records });
+      this.flash(records.find(r => r.id === id)?.reviewStatus === status
+        ? (status === 'aprovado' ? 'Semanário aprovado. O professor já pode consultar.' : 'Ajustes solicitados. O professor já pode consultar.')
+        : 'O professor alterou o semanário. Revise a nova versão.');
+    } catch { this.flash('Não foi possível enviar a revisão. Confira a conexão ou entre novamente.'); }
+    finally { this._writing = false; }
+  }
+
+  startUpdates() {
+    this._generation = (this._generation || 0) + 1;
+    clearInterval(this._updates);
+    if (this._onFocus) window.removeEventListener('focus', this._onFocus);
+    this._onFocus = () => this.refreshRecords();
+    window.addEventListener('focus', this._onFocus);
+    this._updates = setInterval(() => this.refreshRecords(), 30000);
+  }
+
+  async refreshRecords() {
+    if (this.state.screen === 'login' || this._writing || this._refreshing || document.hidden) return;
+    // Preserve the direction's observation draft while it is being typed.
+    if (this.state.coordinator && document.activeElement?.tagName === 'TEXTAREA') return;
+    const generation = this._generation;
+    this._refreshing = true;
+    try {
+      const records = await semanarioBackend.records();
+      if (generation !== this._generation || this._writing || this.state.screen === 'login') return;
+      const changed = !this.state.coordinator && records.some(r => {
+        const old = this.state.records.find(x => x.id === r.id);
+        return old && (old.reviewStatus !== r.reviewStatus || old.reviewedAt !== r.reviewedAt);
+      });
+      if (JSON.stringify(records) !== JSON.stringify(this.state.records)) this.setState({ records });
+      if (changed) this.flash('Há uma nova revisão da direção. Confira em Ver semanários.');
+    } catch { /* Keep saved records visible and retry on the next refresh. */ }
+    finally { this._refreshing = false; }
   }
 
   async remove(id) {
@@ -176,8 +208,8 @@ class Component extends DCLogic {
   }
 
   filtered() {
-    const { records, flt, coordinator } = this.state;
-    return records.filter(r => (!coordinator || !flt.professor || r.professor === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
+    const { records, flt, coordinator, reviewFilter } = this.state;
+    return records.filter(r => (!reviewFilter || r.reviewStatus === reviewFilter) && (!coordinator || !flt.professor || r.professor === flt.professor) && (!flt.turma || r.turma === flt.turma) && (!flt.disciplina || r.disciplina === flt.disciplina) && (!flt.from || (r.endDate || r.date) >= flt.from) && (!flt.to || r.date <= flt.to)).sort(sortDesc);
   }
 
   renderVals() {
@@ -203,7 +235,7 @@ class Component extends DCLogic {
     };
     const openRec = s.openId ? s.records.find(r => r.id === s.openId) : null;
     const td = dp(TODAY);
-    const hasFilters = !!((s.coordinator && s.flt.professor) || s.flt.turma || s.flt.disciplina || s.flt.from || s.flt.to);
+    const hasFilters = !!(s.reviewFilter || (s.coordinator && s.flt.professor) || s.flt.turma || s.flt.disciplina || s.flt.from || s.flt.to);
     const setFlt = k => val(v => this.setState(st => ({ flt: { ...st.flt, [k]: v } })));
     const nSel = s.selected.length;
     const vw = (typeof window !== 'undefined' && window.innerWidth) || 1280;
@@ -224,6 +256,15 @@ class Component extends DCLogic {
       isCoordinator: s.coordinator,
       isCoordHome: s.screen === 'coordHome',
       coordTotal: s.records.length,
+      reviewEnviado: s.records.filter(r => r.reviewStatus === 'enviado').length,
+      reviewAjustes: s.records.filter(r => r.reviewStatus === 'ajustes').length,
+      reviewAprovado: s.records.filter(r => r.reviewStatus === 'aprovado').length,
+      hasReviewNotifications: !s.coordinator && s.records.some(r => ['ajustes','aprovado'].includes(r.reviewStatus)),
+      viewAdjustments: () => { this.go('list', { reviewFilter: 'ajustes' }); this.refreshRecords(); },
+      viewApproved: () => { this.go('list', { reviewFilter: 'aprovado' }); this.refreshRecords(); },
+      reviewFilterLabel: REVIEW_LABELS[s.reviewFilter] || 'Todos os estados',
+      reviewFilter: s.reviewFilter,
+      setReviewFilter: val(reviewFilter => this.setState({ reviewFilter })),
       coordClasses: new Set(s.records.map(record => record.turma)).size,
       coordNotes: s.records.filter(record => record.coordObservation?.trim()).length,
       isTeacher: !s.coordinator,
@@ -249,6 +290,7 @@ class Component extends DCLogic {
         } finally {
           this._signingIn = false;
         }
+        this.startUpdates();
         const coordinator = account.profile.role === 'director';
         const profile = { records: account.records, coordinator, name: account.profile.name, password: '' };
         if (coordinator) {
@@ -265,14 +307,17 @@ class Component extends DCLogic {
         this._riseEnd = setTimeout(() => this.setState({ rise: false }), 2300);
       },
       logout: () => {
+        this._generation = (this._generation || 0) + 1;
+        clearInterval(this._updates);
+        window.removeEventListener('focus', this._onFocus);
         clearTimeout(this._splashEnd);
         clearTimeout(this._riseEnd);
         semanarioBackend.logout();
-        this.go('login', { email: '', password: '', coordinator: false, splash: '', rise: false, records: [], name: '', selected: [], printIds: [], flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } });
+        this.go('login', { email: '', password: '', coordinator: false, splash: '', rise: false, records: [], name: '', reviewFilter: '', selected: [], printIds: [], flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } });
       },
       goHome: () => this.go(s.coordinator ? 'coordHome' : 'home'),
       goCreate: () => this.go('create', { editingId: null, f: blank(), formError: '' }),
-      goList: () => this.go('list'),
+      goList: () => { this.go('list', { reviewFilter: '' }); this.refreshRecords(); },
       listNavBg: s.screen === 'list' ? 'var(--color-neutral-200)' : 'transparent',
 
       teacherName: [...new Set(printRecs.map(r => r.professor))].join(', ') || s.name, teacherFirst: s.name.split(' ')[0],
@@ -285,7 +330,7 @@ class Component extends DCLogic {
 
       f: s.f, turmasCadastro: s.f.turma && !TURMAS_CADASTRADAS.includes(s.f.turma) ? [...TURMAS_CADASTRADAS, s.f.turma] : TURMAS_CADASTRADAS, turmas: filterOptions('turma'), disciplinas: filterOptions('disciplina'), disciplinasCadastro: s.f.disciplina && !DISCIPLINAS_CADASTRADAS.includes(s.f.disciplina) ? [...DISCIPLINAS_CADASTRADAS, s.f.disciplina] : DISCIPLINAS_CADASTRADAS,
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
-      saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar semanário',
+      saveLabel: s.editingId ? 'Salvar e reenviar' : 'Salvar e enviar',
       notEditing: !s.editingId, formError: s.formError,
       setWeek: val(v => this.setF('date', v)),
       setWeekEnd: val(v => this.setF('endDate', v)), setTurma: val(v => this.setF('turma', v)), setDisciplina: val(v => this.setF('disciplina', v)),
@@ -298,14 +343,14 @@ class Component extends DCLogic {
 
       professores: [...new Set(s.records.map(r => r.professor))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
       flt: s.flt, fProfessor: setFlt('professor'), fTurma: setFlt('turma'), fDisc: setFlt('disciplina'), fFrom: setFlt('from'), fTo: setFlt('to'),
-      hasFilters, clearFilters: () => this.setState({ flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } }),
+      hasFilters, clearFilters: () => this.setState({ reviewFilter: '', flt: { professor: '', turma: '', disciplina: '', from: '', to: '' } }),
       filteredCount: filtered.length, noRows: filtered.length === 0,
       allBox: box(allOn),
       toggleAll: () => this.setState(st => { const ids = filtered.map(r => r.id); return { selected: allOn ? st.selected.filter(id => !ids.includes(id)) : [...new Set([...st.selected, ...ids])] }; }),
       selectedLabel: nSel ? nSel + (nSel === 1 ? ' selecionado' : ' selecionados') : 'Nenhum selecionado',
       noSelection: nSel === 0, printOpacity: nSel ? 1 : 0.45,
       goPrint: () => { if (nSel) this.go('print', { printFormat: 'boxes', printIds: [...s.selected] }); },
-      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', saveCoord: e => this.saveCoord(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id), remove: () => this.remove(r.id) }; }),
+      rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', review: e => this.review(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id), remove: () => this.remove(r.id) }; }),
 
       printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,

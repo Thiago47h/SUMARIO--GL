@@ -7,8 +7,8 @@
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/app.css?v=6">
-<script defer src="js/backend.js"></script>
-<script defer src="js/bootstrap.js"></script>
+<script defer src="js/backend.js?v=review1"></script>
+<script defer src="js/bootstrap.js?v=review1"></script>
 <style>
 .login-layout {
   flex: 1;
@@ -109,6 +109,9 @@
 <div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordTotal }}</strong>Semanários salvos</div>
 <div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordClasses }}</strong>Turmas com semanários</div>
 <div style="padding:16px;background:var(--color-surface);border-radius:var(--radius-md)"><strong style="display:block;font-size:28px">{{ coordNotes }}</strong>Semanários com observação</div>
+<div style="padding:16px;background:var(--color-surface)"><strong style="display:block;font-size:28px">{{ reviewEnviado }}</strong>Enviados</div>
+<div style="padding:16px;background:var(--color-surface)"><strong style="display:block;font-size:28px">{{ reviewAjustes }}</strong>Ajustes</div>
+<div style="padding:16px;background:var(--color-surface)"><strong style="display:block;font-size:28px">{{ reviewAprovado }}</strong>Aprovados</div>
 </div>
 <button class="welcome-action" sc-camel-on-click="{{ goList }}">Ver semanários →</button>
 </main>
@@ -116,6 +119,16 @@
 
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="02 Início" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-8)">
+<sc-if value="{{ hasReviewNotifications }}">
+<section role="status" aria-live="polite" style="padding:16px;border:1px solid var(--color-divider);background:var(--color-surface);border-radius:var(--radius-md)">
+<strong>Notificações da direção</strong>
+<p style="margin:8px 0">{{ reviewAjustes }} semanário(s) com ajustes solicitados · {{ reviewAprovado }} aprovado(s).</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button type="button" sc-camel-on-click="{{ viewAdjustments }}">Ver ajustes</button>
+<button type="button" sc-camel-on-click="{{ viewApproved }}">Ver aprovados</button>
+</div>
+</section>
+</sc-if>
 <div style="display:flex;flex-direction:column;gap:var(--space-2);max-width:640px">
 <span style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">{{ todayLabel }}</span>
 <h1 class="welcome-greeting" data-greet-on-entry="{{ greetOnEntry }}"><span>{{ greeting }}, {{ teacherFirst }}.</span></h1>
@@ -133,7 +146,7 @@
 <span style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-700)">{{ r.turma }} · {{ r.disciplina }}</span>
 <span style="font:600 20px/1.2 var(--font-heading)">{{ r.dateShort }} — {{ r.aulasLabel }}</span>
 <span style="font-size:15px;line-height:1.5;color:var(--color-neutral-800);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ r.conteudo }}</span>
-<span style="font-size:13px;color:var(--color-neutral-700)">{{ r.weekday }}{{ r.tarefaHint }}</span>
+<span style="font-size:13px;color:var(--color-neutral-700)">{{ r.statusLabel }} · {{ r.weekday }}{{ r.tarefaHint }}</span>
 </button>
 </sc-for>
 </div>
@@ -208,10 +221,25 @@
 
 <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="04 Ver semanários" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-8) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:var(--space-6)">
+<sc-if value="{{ hasReviewNotifications }}">
+<section role="status" aria-live="polite" style="padding:16px;border:1px solid var(--color-divider);background:var(--color-surface);border-radius:var(--radius-md)">
+<strong>Notificações da direção</strong>
+<p style="margin:8px 0">{{ reviewAjustes }} semanário(s) com ajustes solicitados · {{ reviewAprovado }} aprovado(s).</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button type="button" sc-camel-on-click="{{ viewAdjustments }}">Ver ajustes</button>
+<button type="button" sc-camel-on-click="{{ viewApproved }}">Ver aprovados</button>
+</div>
+</section>
+</sc-if>
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
 <h1 style="margin:0;font-size:clamp(32px,5vw,42px)">{{ listTitle }}</h1>
 <p style="margin:0;font-size:17px;color:var(--color-neutral-700)">Filtre, abra ou edite. Marque os registros que deseja visualizar.</p>
 </div>
+<label style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">Situação
+<sc-raw-select value="{{ reviewFilter }}" sc-camel-on-change="{{ setReviewFilter }}" style="min-height:44px;padding:8px;background:var(--color-surface);font:inherit">
+<option value="">Todos os estados</option><option value="enviado">Enviado</option><option value="ajustes">Ajustes</option><option value="aprovado">Aprovado</option>
+</sc-raw-select>
+</label>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:var(--space-3);align-items:end">
 <sc-if value="{{ isCoordinator }}">
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px">Professor
@@ -273,16 +301,20 @@ Selecionar todos ({{ filteredCount }})
 </div>
 <span style="font-size:15px;line-height:1.5;color:var(--color-neutral-800);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ r.conteudo }}</span>
 <div style="display:grid;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--color-divider)">
-<strong style="font-size:14px">Observação da coordenação</strong>
+<strong style="font-size:14px">Situação: {{ r.statusLabel }}</strong><strong style="font-size:14px">Observação da coordenação</strong>
 <sc-if value="{{ isTeacher }}">
 <sc-if value="{{ r.coordObservation }}">
 <p style="margin:0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere">{{ r.coordObservation }}</p>
 </sc-if>
 </sc-if>
 <sc-if value="{{ isCoordinator }}">
-<form sc-camel-on-submit="{{ r.saveCoord }}" style="display:grid;gap:6px">
+<form sc-camel-on-submit="{{ r.review }}" style="display:grid;gap:6px">
 <textarea name="note" aria-label="Observação da coordenação" sc-camel-default-value="{{ r.coordObservation }}" rows="2" style="width:100%;resize:vertical;font:inherit"></textarea>
-<button type="submit" style="justify-self:start;min-height:36px;cursor:pointer">Salvar observação</button>
+<span style="font-size:13px">Para solicitar ajustes, descreva acima o que precisa ser alterado.</span>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="submit" name="decision" value="aprovado" style="min-height:40px;padding:8px 14px;cursor:pointer">Aprovar</button>
+<button type="submit" name="decision" value="ajustes" style="min-height:40px;padding:8px 14px;cursor:pointer">Solicitar ajustes</button>
+</div>
 </form>
 </sc-if>
 </div>
@@ -441,7 +473,7 @@ Selecionar todos ({{ filteredCount }})
 <div style="display:flex;flex-direction:column;gap:var(--space-1)">
 <span style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-700)">{{ o.turma }} · {{ o.disciplina }}</span>
 <span style="font:600 26px/1.15 var(--font-heading)">{{ o.dateLong }}</span>
-<span style="align-self:flex-start;font-size:13px;padding:3px 10px;border-radius:var(--radius-sm);background:var(--color-accent-100);color:var(--color-accent-800)">{{ o.aulasLabel }}</span>
+<span style="align-self:flex-start;font-size:13px;padding:3px 10px;border-radius:var(--radius-sm);background:var(--color-accent-100);color:var(--color-accent-800)">{{ o.aulasLabel }}</span><strong>Situação: {{ o.statusLabel }}</strong>
 </div>
 <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">Conteúdo a ser trabalhado</span><p style="margin:0;font-size:16px;line-height:1.55">{{ o.conteudo }}</p></div>
 <sc-if value="{{ o.recursos }}"><div><strong>Recursos e estratégias</strong><p style="white-space:pre-wrap">{{ o.recursos }}</p></div></sc-if>
