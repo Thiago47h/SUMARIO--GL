@@ -1,3 +1,11 @@
+const TURMAS_CADASTRADAS = [
+  '6ºA - MANHÃ/2026',
+  '6ºB - TARDE/2026',
+  '6ºC - MANHÃ/2026',
+  '6ºD - TARDE/2026',
+  '7ºA - MANHÃ/2026',
+  '7ºB - TARDE/2026',
+];
 const TODAY = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const WD = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const WDS = ['dom','seg','ter','qua','qui','sex','sáb'];
@@ -230,7 +238,7 @@ class Component extends DCLogic {
       totalCount: s.records.length,
       recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (120 + i * 60) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
 
-      f: s.f, turmas: filterOptions('turma'), disciplinas: filterOptions('disciplina'),
+      f: s.f, turmasCadastro: s.f.turma && !TURMAS_CADASTRADAS.includes(s.f.turma) ? [...TURMAS_CADASTRADAS, s.f.turma] : TURMAS_CADASTRADAS, turmas: filterOptions('turma'), disciplinas: filterOptions('disciplina'),
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
       saveLabel: s.editingId ? 'Salvar alterações' : 'Salvar semanário',
       notEditing: !s.editingId, formError: s.formError,
