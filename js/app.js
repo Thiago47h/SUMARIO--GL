@@ -1,14 +1,14 @@
 const DISCIPLINAS_CADASTRADAS = [
+  'Ciência e Tecnologia',
+  'Ciências',
+  'Educação Cristã',
+  'Educação Física',
   'Espanhol',
-  'Língua Portuguesa',
-  'Matemática',
   'Geografia',
   'História',
-  'Ciências',
-  'Educação Física',
-  'Educação Cristã',
-  'Ciência e Tecnologia',
   'Inglês',
+  'Língua Portuguesa',
+  'Matemática',
 ];
 const TURMAS_CADASTRADAS = [
   '6ºA - MANHÃ/2026',
