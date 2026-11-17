@@ -291,6 +291,7 @@ Selecionar todos ({{ filteredCount }})
 <button sc-camel-on-click="{{ r.open }}" style="min-height:40px;padding:0 var(--space-3);border:1px solid var(--color-divider);border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:var(--color-text);cursor:pointer" style-hover="background:var(--color-neutral-200)">Abrir</button>
 <sc-if value="{{ isTeacher }}">
 <button sc-camel-on-click="{{ r.edit }}" style="min-height:40px;padding:0 var(--space-3);border:none;border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:var(--color-accent-700);cursor:pointer" style-hover="background:var(--color-accent-100)">Editar</button>
+<button type="button" sc-camel-on-click="{{ r.remove }}" style="min-height:40px;padding:0 var(--space-3);border:1px solid #9d3535;border-radius:var(--radius-md);background:transparent;font:600 14px var(--font-heading);color:#8b2929;cursor:pointer">Excluir</button>
 </sc-if>
 </div>
 </div>
