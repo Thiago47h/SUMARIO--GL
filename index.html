@@ -6,9 +6,9 @@
 <title>Semanário | Colégio Gênesis Life</title>
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/app.css?v=multi-class1">
+<link rel="stylesheet" href="css/app.css?v=review-sidebar1">
 <script defer src="js/backend.js?v=multi-class1"></script>
-<script defer src="js/bootstrap.js?v=multi-class1"></script>
+<script defer src="js/bootstrap.js?v=review-sidebar1"></script>
 <style>
 .login-layout {
   flex: 1;
@@ -363,7 +363,7 @@ Selecionar todos ({{ filteredCount }})
 </sc-if>
 
 <sc-if value="{{ isPrint }}" hint-placeholder-val="{{ false }}">
-<main data-screen-label="05 Prévia de impressão" data-print-wrap="true" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-6) clamp(12px,4vw,40px) var(--space-8);display:flex;flex-direction:column;gap:var(--space-4)">
+<main class="preview-screen" data-coordinator="{{ isCoordinator }}" data-screen-label="05 Prévia de impressão" data-print-wrap="true" style="width:100%;max-width:1120px;margin:0 auto;padding:var(--space-6) clamp(12px,4vw,40px) var(--space-8);display:flex;flex-direction:column;gap:var(--space-4)">
 <div data-print-hide="true" style="max-width:794px;width:100%;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-4)">
 <button sc-camel-on-click="{{ goList }}" style="min-height:44px;background:none;border:none;padding:0;color:var(--color-accent-700);font:600 15px var(--font-heading);cursor:pointer">← Voltar aos semanários</button>
 <label class="print-format-label">
@@ -379,6 +379,7 @@ Selecionar todos ({{ filteredCount }})
 <span style="margin-left:auto;font-size:14px;color:var(--color-neutral-700)">A4 {{ printOrientation }} · {{ printCount }} registros</span>
 <button sc-camel-on-click="{{ doPrint }}" style="min-height:48px;padding:0 var(--space-6);border:none;border-radius:var(--radius-md);background:var(--color-accent);color:var(--color-bg);font:600 16px var(--font-heading);cursor:pointer" style-hover="background:var(--color-accent-600)">Imprimir / Salvar em PDF</button>
 </div>
+<div class="preview-layout" data-coordinator="{{ isCoordinator }}">
 <article data-print-page="true" data-print-format="{{ printFormat }}" style="width:100%;max-width:794px;min-height:1123px;margin:0 auto;padding:clamp(24px,7vw,64px) clamp(20px,7vw,68px);background:#f4ecd9;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:var(--space-6)">
 <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-3)">
 <img src="assets/logo.png?v=2" alt="Colégio Gênesis Life" style="height:64px;width:auto">
@@ -491,6 +492,36 @@ Selecionar todos ({{ filteredCount }})
 <span>Colégio Gênesis Life · Emitido em {{ todayShort }}</span>
 </div>
 </article>
+<sc-if value="{{ isCoordinator }}">
+<aside class="preview-review-sidebar" data-print-hide="true" aria-label="Revisão da direção">
+<div class="preview-review-intro">
+<h2>Revisão da direção</h2>
+<p>Leia o planejamento e envie seu retorno ao professor.</p>
+</div>
+<sc-for list="{{ printRows }}" as="p">
+<section class="preview-review-card" data-review-status="{{ p.reviewStatus }}">
+<div class="plan-review-heading">
+<strong>{{ p.turma }}</strong>
+<span class="review-badge"><span class="review-badge-dot" aria-hidden="true"></span>{{ p.statusLabel }}</span>
+</div>
+<p class="preview-review-meta">{{ p.disciplina }} · {{ p.professor }}</p>
+<p class="preview-review-meta">{{ p.dateShort }}</p>
+<form class="coord-review-form" sc-camel-on-submit="{{ p.review }}">
+<label class="coord-message-title">Observação da coordenação
+<textarea name="note" aria-label="Observação da coordenação" sc-camel-default-value="{{ p.coordObservation }}" rows="5"></textarea>
+</label>
+<span class="coord-review-help">Para solicitar ajustes, escreva a orientação que será enviada ao professor.</span>
+<div class="coord-review-actions">
+<button class="review-approve" type="submit" name="decision" value="aprovado">✓ Aprovar</button>
+<button class="review-adjust" type="submit" name="decision" value="ajustes">Solicitar ajustes</button>
+</div>
+</form>
+</section>
+</sc-for>
+<button class="preview-back-button" type="button" sc-camel-on-click="{{ goList }}">← Voltar aos semanários</button>
+</aside>
+</sc-if>
+</div>
 </main>
 </sc-if>
 

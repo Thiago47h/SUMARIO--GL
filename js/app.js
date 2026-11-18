@@ -372,7 +372,7 @@ class Component extends DCLogic {
       goPrint: () => { if (nSel) this.go('print', { printFormat: 'boxes', printIds: [...s.selected] }); },
       rows: filtered.map(deco).map(r => { const on = sel.has(r.id); const b = box(on); return { ...r, coordObservation: r.coordObservation || '', review: e => this.review(r.id, e), mark: b.mark, boxBorder: b.border, boxBg: b.bg, rowBg: on ? 'var(--color-accent-100)' : 'var(--color-surface)', rowRing: on ? 'inset 0 0 0 1px var(--color-accent-300)' : 'none', toggle: () => this.setState(st => ({ selected: on ? st.selected.filter(x => x !== r.id) : [...st.selected, r.id] })), open: () => this.setState({ openId: r.id }), edit: () => this.edit(r.id), remove: () => this.remove(r.id) }; }),
 
-      printRows: printRecs.map(r => ({ ...r, showMeta: multi })), printCount: printRecs.length, pm,
+      printRows: printRecs.map(r => ({ ...r, showMeta: multi, review: e => this.review(r.id, e) })), printCount: printRecs.length, pm,
       printFormat: s.printFormat,
       setPrintFormat: val(printFormat => this.setState({ printFormat })),
       groupedPrint: s.printFormat === 'weekly' || s.printFormat === 'monthly',

@@ -1,5 +1,5 @@
 (async () => {
-  const response = await fetch('js/app.js?v=multi-class1');
+  const response = await fetch('js/app.js?v=review-sidebar1');
   if (!response.ok) throw new Error('Falha ao carregar js/app.js');
   document.querySelector('[data-dc-script]').textContent = await response.text();
 
