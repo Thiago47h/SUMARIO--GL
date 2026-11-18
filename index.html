@@ -6,9 +6,9 @@
 <title>Semanário | Colégio Gênesis Life</title>
 <style>x-dc { display: none !important; }</style>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/app.css?v=review-style2">
-<script defer src="js/backend.js?v=review1"></script>
-<script defer src="js/bootstrap.js?v=review1"></script>
+<link rel="stylesheet" href="css/app.css?v=multi-class1">
+<script defer src="js/backend.js?v=multi-class1"></script>
+<script defer src="js/bootstrap.js?v=multi-class1"></script>
 <style>
 .login-layout {
   flex: 1;
@@ -168,12 +168,14 @@
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Até *
 <input type="date" value="{{ f.endDate }}" sc-camel-on-change="{{ setWeekEnd }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)" style-focus="border-color:var(--color-accent);outline:none">
 </label>
+<sc-if value="{{ isEditing }}">
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Turma *
 <sc-raw-select value="{{ f.turma }}" sc-camel-on-change="{{ setTurma }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
 <option value="">Selecione a turma</option>
 <sc-for list="{{ turmasCadastro }}" as="turma"><option value="{{ turma }}">{{ turma }}</option></sc-for>
 </sc-raw-select>
 </label>
+</sc-if>
 <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--color-neutral-800)">Disciplina *
 <sc-raw-select value="{{ f.disciplina }}" sc-camel-on-change="{{ setDisciplina }}" style="min-height:48px;padding:8px 12px;font:inherit;font-size:16px;color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md)">
 <option value="">Selecione a disciplina</option>
@@ -181,6 +183,21 @@
 </sc-raw-select>
 </label>
 </div>
+<sc-if value="{{ notEditing }}">
+<fieldset class="turma-picker">
+<legend>Turmas *</legend>
+<p class="turma-picker-help">Selecione uma ou mais turmas. O mesmo planejamento será enviado para cada turma, com revisão independente.</p>
+<div class="turma-picker-grid">
+<sc-for list="{{ turmaChips }}" as="t">
+<button type="button" class="turma-option" aria-pressed="{{ t.selected }}" sc-camel-on-click="{{ t.toggle }}">
+<span class="turma-option-check" aria-hidden="true">{{ t.mark }}</span><span>{{ t.turma }}</span>
+</button>
+</sc-for>
+</div>
+<p class="turma-picker-count" role="status" aria-live="polite">{{ turmaSelectionLabel }}</p>
+</fieldset>
+</sc-if>
+<sc-if value="{{ isEditing }}"><p class="turma-picker-help">Você está editando somente o semanário desta turma.</p></sc-if>
 <fieldset style="border:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-2)">
 <legend style="padding:0;margin-bottom:6px;font-size:14px;color:var(--color-neutral-800)">Aula(s) * <span style="color:var(--color-neutral-700)">— toque em uma ou mais</span></legend>
 <div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">

@@ -67,6 +67,19 @@ const semanarioBackend = (() => {
       if (!row) throw new Error('Semanário indisponível.');
       return fromPlan(row);
     },
+    async saveMany(plans) {
+      if (!plans.length) throw new Error('Selecione ao menos uma turma.');
+      // One bulk insert: all classroom records are saved in the same transaction.
+      const rows = await request('/rest/v1/semanario_plans', {
+        method: 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(plans.map(({ date, endDate, ...plan }) => ({
+          ...plan, start_date: date, end_date: endDate,
+        }))),
+      });
+      if (!rows || rows.length !== plans.length) throw new Error('Resposta de gravação incompleta.');
+      return rows.map(fromPlan);
+    },
     async remove(id) {
       const [record] = await request('/rest/v1/semanario_plans?id=eq.' + encodeURIComponent(id), {
         method: 'PATCH',

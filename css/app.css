@@ -264,3 +264,14 @@ button,input,select,textarea{font-family:inherit}
   .coord-message { padding: 12px; }
   .coord-review-actions button { flex: 1 1 140px; }
 }
+
+.turma-picker { border: 0; padding: 0; margin: 0; min-width: 0; }
+.turma-picker legend { padding: 0; font-size: 14px; margin-bottom: 6px; }
+.turma-picker-help { font-size: 14px; line-height: 1.5; color: var(--color-neutral-700); margin: 0 0 12px; }
+.turma-picker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 8px; }
+.turma-option { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 10px 12px; border: 1px solid var(--color-divider); border-radius: 7px; background: var(--color-surface); color: var(--color-text); font: 400 14px/1.4 var(--font-body); text-align: left; cursor: pointer; }
+.turma-option-check { display: grid; place-items: center; width: 19px; height: 19px; flex: none; border: 1px solid var(--color-neutral-600); border-radius: 4px; }
+.turma-option[aria-pressed="true"] { background: var(--color-accent-100); border-color: var(--color-accent); }
+.turma-option[aria-pressed="true"] .turma-option-check { background: var(--color-accent); border-color: var(--color-accent); color: white; }
+.turma-option:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.turma-picker-count { font-size: 14px; color: var(--color-accent-700); margin: 10px 0 0; }

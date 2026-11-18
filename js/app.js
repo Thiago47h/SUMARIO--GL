@@ -50,7 +50,7 @@ const weekEnd = iso => {
 };
 const periodLabel = (start, end) => end && end !== start ? fmt(start) + ' a ' + fmt(end) : fmt(start);
 const aulasLabel = a => { const s = [...a].sort((x, y) => x - y).map(n => n + 'ª'); if (!s.length) return ''; if (s.length === 1) return s[0] + ' aula'; return s.slice(0, -1).join(', ') + ' e ' + s[s.length - 1] + ' aulas'; };
-const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', disciplina: '', aulas: [], paginas: '', recursos: '', conteudo: '', tarefa: '', obs: '' });
+const blank = () => ({ date: weekStart(TODAY), endDate: weekEnd(TODAY), turma: '', turmas: [], disciplina: '', aulas: [], paginas: '', recursos: '', conteudo: '', tarefa: '', obs: '' });
 const deco = r => { const d = dp(r.date); return { ...r, statusLabel: REVIEW_LABELS[r.reviewStatus] || 'Enviado', dayMonth: pad(d.getDate()) + '/' + pad(d.getMonth() + 1), year: d.getFullYear(), weekday: WD[d.getDay()], weekdayShort: WDS[d.getDay()], dateShort: periodLabel(r.date, r.endDate), dateLong: r.endDate && r.endDate !== r.date ? periodLabel(r.date, r.endDate) : WD[d.getDay()] + ', ' + d.getDate() + ' de ' + MO[d.getMonth()] + ' de ' + d.getFullYear(), aulasLabel: aulasLabel(r.aulas) }; };
 const sortDesc = (a, b) => b.date.localeCompare(a.date) || Math.max(...b.aulas) - Math.max(...a.aulas);
 
@@ -95,10 +95,12 @@ class Component extends DCLogic {
 
   async save(another) {
     if (this._writing || this.state.coordinator) return;
-    const { f: draft, editingId, records } = this.state;
-    const f = { ...draft, turma: draft.turma.trim(), disciplina: draft.disciplina.trim() };
-    if (!f.date || !f.endDate || !f.turma || !f.disciplina || !f.aulas.length || !f.paginas.trim() || !f.conteudo.trim()) {
-      this.setState({ formError: 'Preencha semana, turma, disciplina, aula(s), páginas a serem trabalhadas e conteúdo a ser trabalhado.' });
+    const { f: draft, editingId } = this.state;
+    const turmas = [...new Set((editingId ? [draft.turma] : draft.turmas || []).map(turma => turma.trim()).filter(Boolean))];
+    const { turmas: ignored, ...fields } = draft;
+    const f = { ...fields, disciplina: draft.disciplina.trim() };
+    if (!f.date || !f.endDate || !turmas.length || !f.disciplina || !f.aulas.length || !f.paginas.trim() || !f.conteudo.trim()) {
+      this.setState({ formError: 'Preencha semana, turma(s), disciplina, aula(s), páginas a serem trabalhadas e conteúdo a ser trabalhado.' });
       return;
     }
     if (f.endDate < f.date) {
@@ -106,34 +108,39 @@ class Component extends DCLogic {
       return;
     }
     let saved;
+    const generation = this._generation;
     this._writing = true;
     try {
-      saved = await semanarioBackend.save(editingId, f);
-      if (this.state.screen === 'login') return;
+      saved = editingId
+        ? [await semanarioBackend.save(editingId, { ...f, turma: turmas[0] })]
+        : await semanarioBackend.saveMany(turmas.map(turma => ({ ...f, turma })));
+      if (this.state.screen === 'login' || generation !== this._generation) return;
     } catch {
-      this.setState({ formError: 'Não foi possível salvar. Confira a conexão ou entre novamente.' });
+      this.setState({ formError: 'Não foi possível salvar. Suas informações foram mantidas. Confira a conexão ou entre novamente.' });
       return;
     } finally {
       this._writing = false;
     }
     const next = editingId
-      ? records.map(record => record.id === editingId ? { ...saved, coordObservation: record.coordObservation } : record)
-      : [saved, ...records];
-    const label = periodLabel(f.date, f.endDate) + ' · ' + f.turma;
+      ? this.state.records.map(record => record.id === editingId ? { ...saved[0], coordObservation: record.coordObservation } : record)
+      : [...saved, ...this.state.records];
+    const message = editingId ? 'Alterações enviadas para revisão.'
+      : turmas.length === 1 ? 'Semanário enviado para ' + turmas[0] + '.'
+      : 'Semanários enviados para ' + turmas.length + ' turmas.';
     if (another) {
-      this.setState({ records: next, f: { ...blank(), date: f.date, endDate: f.endDate, turma: f.turma, disciplina: f.disciplina }, formError: '' });
+      this.setState({ records: next, f: { ...blank(), date: f.date, endDate: f.endDate, turma: turmas[0], turmas, disciplina: f.disciplina }, formError: '' });
       window.scrollTo(0, 0);
-      this.flash('Semanário salvo (' + label + '). Preencha o próximo.');
+      this.flash(message + ' Preencha o próximo.');
     } else {
       this.go('list', { records: next, editingId: null, f: blank() });
-      this.flash(editingId ? 'Alterações enviadas para revisão.' : 'Semanário enviado: ' + label);
+      this.flash(message);
     }
   }
 
   edit(id) {
     const r = this.state.records.find(x => x.id === id);
     if (!r) return;
-    this.go('create', { editingId: id, f: { date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, recursos: r.recursos || '', tarefa: r.tarefa, obs: r.obs }, formError: '' });
+    this.go('create', { editingId: id, f: { turmas: [r.turma], date: r.date, endDate: r.endDate || r.date, turma: r.turma, disciplina: r.disciplina, aulas: [...r.aulas], paginas: r.paginas || '', conteudo: r.conteudo, recursos: r.recursos || '', tarefa: r.tarefa, obs: r.obs }, formError: '' });
   }
 
   async review(id, event) {
@@ -328,6 +335,19 @@ class Component extends DCLogic {
       totalCount: s.records.length,
       recent: [...s.records].sort(sortDesc).slice(0, 4).map(deco).map((r, i) => ({ ...r, riseDelay: (120 + i * 60) + 'ms', tarefaHint: r.tarefa ? ' · com tarefa de casa' : '', open: () => this.setState({ openId: r.id }) })),
 
+      isEditing: !!s.editingId,
+      turmaSelectionLabel: (s.f.turmas || []).length + ((s.f.turmas || []).length === 1 ? ' turma selecionada' : ' turmas selecionadas'),
+      turmaChips: TURMAS_CADASTRADAS.map(turma => ({
+        turma,
+        selected: (s.f.turmas || []).includes(turma),
+        mark: (s.f.turmas || []).includes(turma) ? '✓' : '',
+        toggle: () => this.setState(state => ({
+          f: { ...state.f, turmas: (state.f.turmas || []).includes(turma)
+            ? state.f.turmas.filter(item => item !== turma)
+            : [...(state.f.turmas || []), turma] },
+          formError: '',
+        })),
+      })),
       f: s.f, turmasCadastro: s.f.turma && !TURMAS_CADASTRADAS.includes(s.f.turma) ? [...TURMAS_CADASTRADAS, s.f.turma] : TURMAS_CADASTRADAS, turmas: filterOptions('turma'), disciplinas: filterOptions('disciplina'), disciplinasCadastro: s.f.disciplina && !DISCIPLINAS_CADASTRADAS.includes(s.f.disciplina) ? [...DISCIPLINAS_CADASTRADAS, s.f.disciplina] : DISCIPLINAS_CADASTRADAS,
       formTitle: s.editingId ? 'Editar semanário' : 'Criar semanário',
       saveLabel: s.editingId ? 'Salvar e reenviar' : 'Salvar e enviar',
