@@ -300,16 +300,13 @@ class Component extends DCLogic {
         this.startUpdates();
         const coordinator = account.profile.role === 'director';
         const profile = { records: account.records, coordinator, name: account.profile.name, password: '' };
-        if (coordinator) {
-          this.go('coordHome', profile);
-          return;
-        }
+        const homeScreen = coordinator ? 'coordHome' : 'home';
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          this.go('home', profile);
+          this.go(homeScreen, profile);
           return;
         }
         this.setState({ splash: 'center', rise: false });
-        setTimeout(() => this.go('home', { ...profile, splash: 'fly', rise: true }), 700);
+        this._splashHome = setTimeout(() => this.go(homeScreen, { ...profile, splash: 'fly', rise: true }), 700);
         this._splashEnd = setTimeout(() => this.setState({ splash: '' }), 1500);
         this._riseEnd = setTimeout(() => this.setState({ rise: false }), 2300);
       },
@@ -317,6 +314,7 @@ class Component extends DCLogic {
         this._generation = (this._generation || 0) + 1;
         clearInterval(this._updates);
         window.removeEventListener('focus', this._onFocus);
+        clearTimeout(this._splashHome);
         clearTimeout(this._splashEnd);
         clearTimeout(this._riseEnd);
         semanarioBackend.logout();
