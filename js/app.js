@@ -301,11 +301,12 @@ class Component extends DCLogic {
         const coordinator = account.profile.role === 'director';
         const profile = { records: account.records, coordinator, name: account.profile.name, password: '' };
         const homeScreen = coordinator ? 'coordHome' : 'home';
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          this.go(homeScreen, profile);
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        this.setState({ splash: 'center', rise: false });
+        if (reducedMotion) {
+          this._splashHome = setTimeout(() => this.go(homeScreen, { ...profile, splash: '', rise: false }), 900);
           return;
         }
-        this.setState({ splash: 'center', rise: false });
         this._splashHome = setTimeout(() => this.go(homeScreen, { ...profile, splash: 'fly', rise: true }), 700);
         this._splashEnd = setTimeout(() => this.setState({ splash: '' }), 1500);
         this._riseEnd = setTimeout(() => this.setState({ rise: false }), 2300);
